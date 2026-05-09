@@ -1,0 +1,361 @@
+.section {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 40px 60px 80px;
+  background-color: #fff;
+}
+
+/* ── Header ── */
+.header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  margin-bottom: 36px;
+}
+
+.headerLeft {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.sectionLabel {
+  font-size: 14px;
+  font-weight: 600;
+  color: #7cb97a;
+  margin: 0;
+}
+
+.heading {
+  font-size: 32px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin: 0;
+  letter-spacing: -0.5px;
+  line-height: 1.2;
+}
+
+.viewAllBtn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #1a1a1a;
+  background: none;
+  border: 1.5px solid #e8e8e8;
+  border-radius: 50px;
+  padding: 10px 20px;
+  cursor: pointer;
+  transition: border-color 0.2s ease, color 0.2s ease;
+}
+
+.viewAllBtn:hover {
+  border-color: #7cb97a;
+  color: #7cb97a;
+}
+
+.arrowIcon {
+  width: 16px;
+  height: 16px;
+  transition: transform 0.2s ease;
+}
+
+.viewAllBtn:hover .arrowIcon {
+  transform: translateX(3px);
+}
+
+/* ── Grid ── */
+.booksGrid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 20px;
+}
+
+/* ── Book Card ── */
+.bookCard {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  cursor: pointer;
+  transition: transform 0.25s ease;
+}
+
+.bookCard:hover {
+  transform: translateY(-4px);
+}
+
+/* ── Book Cover ── */
+.bookCover {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 2 / 3;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 4px 6px 24px rgba(0, 0, 0, 0.14), -2px 0 6px rgba(0, 0, 0, 0.06);
+  transition: box-shadow 0.25s ease;
+}
+
+.bookCard:hover .bookCover {
+  box-shadow: 8px 12px 36px rgba(0, 0, 0, 0.18), -2px 0 8px rgba(0, 0, 0, 0.08);
+}
+
+/* Spine shadow */
+.spine {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 10px;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.18);
+  z-index: 2;
+}
+
+/* Decorative circle on cover */
+.coverDecorCircle {
+  position: absolute;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.15);
+  bottom: -30px;
+  right: -30px;
+  z-index: 1;
+}
+
+/* Decorative horizontal line */
+.coverDecorLine {
+  position: absolute;
+  bottom: 56px;
+  left: 10px;
+  right: 0;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.2);
+  z-index: 1;
+}
+
+/* Cover text content */
+.coverContent {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 16px 14px 20px 20px;
+  z-index: 3;
+}
+
+.coverGenre {
+  font-size: 10px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.7);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  margin-bottom: 6px;
+}
+
+.coverTitle {
+  font-size: 14px;
+  font-weight: 700;
+  color: #fff;
+  margin: 0 0 6px;
+  line-height: 1.3;
+}
+
+.coverAuthor {
+  font-size: 11px;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+/* ── Cover Color Variants ── */
+.green {
+  background: linear-gradient(145deg, #7cb97a 0%, #4a8f48 60%, #2d6b2b 100%);
+}
+
+.purple {
+  background: linear-gradient(145deg, #b0acda 0%, #8880b8 60%, #5e5890 100%);
+}
+
+.dark {
+  background: linear-gradient(145deg, #3a3a3a 0%, #1a1a1a 60%, #0d0d0d 100%);
+}
+
+.orange {
+  background: linear-gradient(145deg, #f0bc94 0%, #e8a87c 40%, #c47840 100%);
+}
+
+.teal {
+  background: linear-gradient(145deg, #7accc8 0%, #4aa8a4 60%, #2d8480 100%);
+}
+
+/* ── Badge ── */
+.badge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 50px;
+  z-index: 4;
+  letter-spacing: 0.3px;
+}
+
+.badgeBestseller {
+  background: #fff;
+  color: #7cb97a;
+}
+
+.badgeNew {
+  background: rgba(255, 255, 255, 0.22);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  backdrop-filter: blur(4px);
+}
+
+.badgeTrending {
+  background: #e8a87c;
+  color: #fff;
+}
+
+/* ── Book Info ── */
+.bookInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.bookTitle {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin: 0;
+  line-height: 1.35;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.bookAuthor {
+  font-size: 12px;
+  font-weight: 400;
+  color: #888;
+  margin: 0;
+}
+
+/* ── Stars ── */
+.stars {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.star {
+  width: 12px;
+  height: 12px;
+}
+
+.starFilled {
+  fill: #f5a623;
+  color: #f5a623;
+}
+
+.starEmpty {
+  fill: #e8e8e8;
+  color: #e8e8e8;
+}
+
+.ratingNum {
+  font-size: 11px;
+  font-weight: 600;
+  color: #555;
+  margin-left: 4px;
+}
+
+/* ── Price ── */
+.priceRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 2px;
+}
+
+.price {
+  font-size: 16px;
+  font-weight: 700;
+  color: #1a1a1a;
+}
+
+.originalPrice {
+  font-size: 13px;
+  font-weight: 400;
+  color: #bbb;
+  text-decoration: line-through;
+}
+
+/* ── Add to Cart Button ── */
+.addToCart {
+  margin-top: 6px;
+  width: 100%;
+  background-color: #7cb97a;
+  color: #fff;
+  border: none;
+  border-radius: 50px;
+  padding: 10px 0;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.15s ease;
+  opacity: 0;
+  transform: translateY(6px);
+}
+
+.bookCard:hover .addToCart {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.addToCart:hover {
+  background-color: #6aa868;
+}
+
+/* ── Responsive ── */
+@media (max-width: 1100px) {
+  .booksGrid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+@media (max-width: 968px) {
+  .section {
+    padding: 40px 24px 60px;
+  }
+
+  .booksGrid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+  }
+
+  .heading {
+    font-size: 26px;
+  }
+}
+
+@media (max-width: 640px) {
+  .booksGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .addToCart {
+    opacity: 1;
+    transform: none;
+  }
+}

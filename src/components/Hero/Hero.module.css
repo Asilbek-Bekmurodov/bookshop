@@ -1,0 +1,300 @@
+/* ─── Layout ──────────────────────────────────────────────── */
+.hero {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 100px 60px 100px;
+  gap: 60px;
+  background-color: #fff;
+  position: relative;
+  overflow: visible;
+}
+
+/* ─── Left Content ────────────────────────────────────────── */
+.leftContent {
+  flex: 1;
+  max-width: 520px;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(135deg, #f0faf0, #e8f5e9);
+  border: 1px solid rgba(124, 185, 122, 0.35);
+  color: #5a9e58;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  padding: 7px 18px;
+  border-radius: 50px;
+  margin-bottom: 28px;
+  animation: revealUp 0.6s ease both;
+}
+
+.headline {
+  font-size: 56px;
+  font-weight: 800;
+  color: #1a1a1a;
+  line-height: 1.12;
+  margin: 0 0 20px;
+  letter-spacing: -2px;
+  animation: revealUp 0.7s ease 0.1s both;
+}
+
+.accent {
+  color: #7cb97a;
+}
+
+.subtitle {
+  font-size: 15px;
+  font-weight: 400;
+  color: #999;
+  margin: 0 0 36px;
+  line-height: 1.7;
+  animation: revealUp 0.7s ease 0.2s both;
+}
+
+.searchBox {
+  display: flex;
+  align-items: center;
+  background-color: #f5f5f5;
+  border-radius: 50px;
+  padding: 6px;
+  max-width: 440px;
+  border: 2px solid transparent;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease, background-color 0.25s ease;
+  animation: revealUp 0.7s ease 0.3s both;
+}
+
+.searchBox:focus-within {
+  background-color: #fff;
+  border-color: rgba(124, 185, 122, 0.5);
+  box-shadow: 0 0 0 4px rgba(124, 185, 122, 0.12);
+}
+
+.searchInput {
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
+  padding: 12px 20px;
+  font-size: 14px;
+  color: #555;
+}
+
+.searchInput::placeholder {
+  color: #bbb;
+}
+
+.searchBtn {
+  background: linear-gradient(135deg, #7cb97a 0%, #5fa85e 100%);
+  color: #fff;
+  border: none;
+  border-radius: 50px;
+  padding: 12px 28px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 4px 16px rgba(124, 185, 122, 0.45);
+  letter-spacing: 0.2px;
+}
+
+.searchBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(124, 185, 122, 0.55);
+}
+
+.searchBtn:active {
+  transform: translateY(0);
+}
+
+.stats {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  margin-top: 40px;
+  animation: revealUp 0.7s ease 0.4s both;
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.statNum {
+  font-size: 22px;
+  font-weight: 800;
+  color: #1a1a1a;
+  letter-spacing: -0.5px;
+  line-height: 1;
+}
+
+.statLabel {
+  font-size: 11px;
+  color: #bbb;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.statDivider {
+  width: 1px;
+  height: 30px;
+  background: #e8e8e8;
+}
+
+/* ─── Right Content ───────────────────────────────────────── */
+.rightContent {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  min-height: 480px;
+  perspective: 1200px;
+}
+
+/* Image wrapper — JS scroll transform applied here */
+.imageWrapper {
+  position: relative;
+  z-index: 2;
+  will-change: transform;
+  animation: videoReveal 1.1s cubic-bezier(0.16, 1, 0.3, 1) 0.15s both;
+}
+
+.heroImage {
+  width: 100%;
+  max-width: 420px;
+  height: auto;
+  display: block;
+  filter: drop-shadow(0 24px 48px rgba(0, 0, 0, 0.12));
+}
+
+/* ─── Floating Icons ──────────────────────────────────────── */
+.floatingIcon {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  z-index: 4;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+  cursor: default;
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
+}
+
+.floatingIcon:hover {
+  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.22);
+  transform: scale(1.08) !important;
+}
+
+.lightbulb {
+  width: 64px;
+  height: 64px;
+  background: linear-gradient(135deg, #7cb97a, #5fa85e);
+  top: 8%;
+  left: 0%;
+  animation: revealUp 0.8s ease 0.5s both, floatY 6s ease-in-out 1.3s infinite;
+}
+
+.award {
+  width: 56px;
+  height: 56px;
+  background: linear-gradient(135deg, #a8a4c8, #8680b8);
+  top: 22%;
+  right: 0%;
+  animation: revealUp 0.8s ease 0.65s both, floatYInv 7s ease-in-out 0.5s infinite;
+}
+
+.target {
+  width: 60px;
+  height: 60px;
+  background: linear-gradient(135deg, #e8a87c, #d4895a);
+  bottom: 14%;
+  left: 4%;
+  animation: revealUp 0.8s ease 0.8s both, floatY 5.5s ease-in-out 2s infinite;
+}
+
+.iconSvg {
+  width: 26px;
+  height: 26px;
+  color: #fff;
+}
+
+/* ─── Keyframes ───────────────────────────────────────────── */
+@keyframes revealUp {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes videoReveal {
+  from {
+    opacity: 0;
+    transform: translateX(50px) scale(0.92) rotateY(-6deg);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0) scale(1) rotateY(0);
+  }
+}
+
+@keyframes floatY {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-12px); }
+}
+
+@keyframes floatYInv {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(10px); }
+}
+
+
+/* ─── Responsive ──────────────────────────────────────────── */
+@media (max-width: 968px) {
+  .hero {
+    flex-direction: column;
+    text-align: center;
+    padding: 40px 24px 80px;
+  }
+
+  .headline {
+    font-size: 40px;
+    letter-spacing: -1px;
+  }
+
+  .searchBox {
+    margin: 0 auto;
+  }
+
+  .stats {
+    justify-content: center;
+  }
+
+  .badge {
+    margin: 0 auto 28px;
+  }
+
+  .rightContent {
+    min-height: 320px;
+  }
+
+  .heroImage {
+    max-width: 280px;
+  }
+
+  .floatingIcon {
+    display: none;
+  }
+}

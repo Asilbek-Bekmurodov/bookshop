@@ -1,0 +1,148 @@
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 60px;
+  max-width: 100%;
+  transition: background-color 0.4s ease, backdrop-filter 0.4s ease, box-shadow 0.4s ease;
+}
+
+/* Over video: transparent with white text */
+.transparent {
+  background-color: transparent;
+  box-shadow: none;
+}
+
+.transparent .logo {
+  color: #fff;
+}
+
+.transparent .navLink {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.transparent .navLink:hover {
+  color: #fff;
+}
+
+.transparent .loginBtn {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.transparent .loginBtn:hover {
+  color: #fff;
+}
+
+.transparent .startBtn {
+  background-color: rgba(255, 255, 255, 0.15);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(8px);
+}
+
+.transparent .startBtn:hover {
+  background-color: rgba(255, 255, 255, 0.25);
+}
+
+/* Over hero/content: solid white */
+.solid {
+  background-color: #fff;
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.06);
+}
+
+.solid .logo {
+  color: #1a1a1a;
+}
+
+.solid .navLink {
+  color: #555;
+}
+
+.solid .navLink:hover {
+  color: #1a1a1a;
+}
+
+.solid .loginBtn {
+  color: #555;
+}
+
+.solid .loginBtn:hover {
+  color: #1a1a1a;
+}
+
+.solid .startBtn {
+  background-color: #1a1a1a;
+  color: #fff;
+  border: 1px solid transparent;
+}
+
+.solid .startBtn:hover {
+  background-color: #333;
+}
+
+/* ─── Elements ─────────────────────────────────────────────── */
+.logo {
+  font-size: 24px;
+  font-weight: 700;
+  text-decoration: none;
+  letter-spacing: -0.5px;
+  transition: color 0.4s ease;
+}
+
+.navLinks {
+  display: flex;
+  align-items: center;
+  gap: 36px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.navLink {
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+  transition: color 0.4s ease;
+  cursor: pointer;
+}
+
+.authButtons {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.loginBtn {
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 10px 16px;
+  transition: color 0.4s ease;
+}
+
+.startBtn {
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: 24px;
+  padding: 10px 24px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, color 0.4s ease, border-color 0.4s ease;
+}
+
+@media (max-width: 768px) {
+  .navbar {
+    padding: 16px 24px;
+  }
+
+  .navLinks {
+    display: none;
+  }
+}

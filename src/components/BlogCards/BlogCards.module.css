@@ -1,0 +1,87 @@
+.blogSection {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 40px 60px 80px;
+  background-color: #fff;
+}
+
+.sectionLabel {
+  font-size: 14px;
+  font-weight: 600;
+  color: #7cb97a;
+  margin: 0 0 24px;
+  text-transform: none;
+}
+
+.cardsGrid {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  gap: 24px;
+}
+
+.featuredCard {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.featuredImage {
+  width: 100%;
+  height: 260px;
+  object-fit: cover;
+  border-radius: 16px;
+}
+
+.featuredTitle {
+  font-size: 22px;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin: 0;
+  line-height: 1.3;
+}
+
+.smallCard {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.cardImage {
+  width: 100%;
+  height: 160px;
+  object-fit: cover;
+  border-radius: 12px;
+}
+
+.cardMeta {
+  font-size: 12px;
+  font-weight: 500;
+  color: #aaa;
+  margin: 0;
+}
+
+.cardTitle {
+  font-size: 15px;
+  font-weight: 600;
+  color: #333;
+  margin: 0;
+  line-height: 1.4;
+}
+
+@media (max-width: 968px) {
+  .blogSection {
+    padding: 40px 24px 60px;
+  }
+
+  .cardsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .featuredImage {
+    height: 200px;
+  }
+
+  .cardImage {
+    height: 180px;
+  }
+}

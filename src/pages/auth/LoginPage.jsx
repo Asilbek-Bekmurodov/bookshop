@@ -28,11 +28,17 @@ const LoginPage = () => {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showPwd, setShowPwd] = useState(false)
+  const [error, setError] = useState('')
   const navigate = useNavigate()
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    navigate('/')
+    if (email === 'user@gmail.com' && password === '123123') {
+      setError('')
+      navigate('/home')
+    } else {
+      setError('Email yoki parol noto\'g\'ri. Iltimos, qaytadan urinib ko\'ring.')
+    }
   }
 
   return (
@@ -140,6 +146,10 @@ const LoginPage = () => {
                 </button>
               </div>
             </div>
+
+            {error && (
+              <p className={styles.errorMsg}>{error}</p>
+            )}
 
             <button type="submit" className={styles.submitBtn}>
               Sign in

@@ -53,6 +53,11 @@ const GridIcon = () => (
     <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
   </svg>
 )
+const UserIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+  </svg>
+)
 
 /* ── Data ───────────────────────────────────────────────────── */
 const BOOKS = [
@@ -78,11 +83,12 @@ const FEATURED = [
 ]
 
 const SIDEBAR_NAV = [
-  { icon: HomeIcon,    label: "Home",       badge: null,  active: true  },
-  { icon: BookOpenIcon,label: "My Library", badge: "14",  active: false },
-  { icon: HeartIcon,   label: "Favourites", badge: "6",   active: false },
-  { icon: CompassIcon, label: "Discover",   badge: null,  active: false },
-  { icon: TrendingIcon,label: "Trending",   badge: null,  active: false },
+  { icon: HomeIcon,    label: "Home",       badge: null,  active: true,  path: "/home"    },
+  { icon: BookOpenIcon,label: "My Library", badge: "14",  active: false, path: null       },
+  { icon: HeartIcon,   label: "Favourites", badge: "6",   active: false, path: null       },
+  { icon: CompassIcon, label: "Discover",   badge: null,  active: false, path: null       },
+  { icon: TrendingIcon,label: "Trending",   badge: null,  active: false, path: null       },
+  { icon: UserIcon,    label: "Profile",    badge: null,  active: false, path: "/profile" },
 ]
 
 /* ── Component ─────────────────────────────────────────────── */
@@ -142,7 +148,7 @@ const DashboardPage = () => {
           <button className={styles.headerIconBtn} title="Logout" onClick={handleLogout}>
             <LogOutIcon />
           </button>
-          <div className={styles.headerAvatar} title="user@gmail.com">UG</div>
+          <div className={styles.headerAvatar} title="user@gmail.com" onClick={() => navigate('/profile')}>UG</div>
         </div>
       </header>
 
@@ -153,8 +159,8 @@ const DashboardPage = () => {
         <aside className={styles.sidebar}>
           <div className={styles.sideSection}>
             <div className={styles.sideSectionTitle}>Menu</div>
-            {SIDEBAR_NAV.map(({ icon: Icon, label, badge, active }) => (
-              <div key={label} className={`${styles.navItem} ${active ? styles.active : ''}`}>
+            {SIDEBAR_NAV.map(({ icon: Icon, label, badge, active, path }) => (
+              <div key={label} className={`${styles.navItem} ${active ? styles.active : ''}`} onClick={() => path && navigate(path)}>
                 <span className={styles.navItemIcon}><Icon /></span>
                 <span>{label}</span>
                 {badge && <span className={styles.navItemBadge}>{badge}</span>}

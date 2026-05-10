@@ -6,6 +6,8 @@ import ProfilePage from './pages/ProfilePage'
 import BookDetailPage from './pages/BookDetailPage'
 import LoginPage from './pages/auth/LoginPage'
 import RegisterPage from './pages/auth/RegisterPage'
+import AdminLoginPage from './pages/admin/AdminLoginPage'
+import AdminDashboard from './pages/admin/AdminDashboard'
 
 function App() {
   return (
@@ -19,6 +21,8 @@ function App() {
       <Route path="/profile" element={<ProfilePage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
+      <Route path="/admin/login" element={<AdminLoginPage />} />
+      <Route path="/admin" element={<AdminDashboard />} />
     </Routes>
   )
 }

@@ -5,6 +5,7 @@ import DashboardPage from './pages/DashboardPage'
 import ProfilePage from './pages/ProfilePage'
 import BookDetailPage from './pages/BookDetailPage'
 import BookReaderPage from './pages/BookReaderPage'
+import LeaderboardPage from './pages/LeaderboardPage'
 import LoginPage from './pages/auth/LoginPage'
 import RegisterPage from './pages/auth/RegisterPage'
 import AdminDashboard from './pages/admin/AdminDashboard'
@@ -24,6 +25,7 @@ function App() {
       </Route>
       <Route path="/books/:id/read" element={<BookReaderPage />} />
       <Route path="/home" element={<DashboardPage />} />
+      <Route path="/leaderboard" element={<LeaderboardPage />} />
       <Route path="/profile" element={<ProfilePage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />

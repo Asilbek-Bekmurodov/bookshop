@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import styles from './DashboardPage.module.css'
 import AudioSection from '../components/AudioSection/AudioSection'
 import AudioPlayer from '../components/AudioPlayer/AudioPlayer'
+import StreakBadge from '../components/StreakBadge/StreakBadge'
 
 /* ── Icons ─────────────────────────────────────────────────── */
 const SearchIcon = () => (
@@ -60,6 +61,14 @@ const UserIcon = () => (
     <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
   </svg>
 )
+const TrophyIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/>
+    <path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/>
+    <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/>
+    <path d="M18 2H6v7a6 6 0 0 0 12 0V2z"/>
+  </svg>
+)
 
 /* ── Data ───────────────────────────────────────────────────── */
 const BOOKS = [
@@ -85,12 +94,13 @@ const FEATURED = [
 ]
 
 const SIDEBAR_NAV = [
-  { icon: HomeIcon,    label: "Home",       badge: null,  active: true,  path: "/home"    },
-  { icon: BookOpenIcon,label: "My Library", badge: "14",  active: false, path: null       },
-  { icon: HeartIcon,   label: "Favourites", badge: "6",   active: false, path: null       },
-  { icon: CompassIcon, label: "Discover",   badge: null,  active: false, path: null       },
-  { icon: TrendingIcon,label: "Trending",   badge: null,  active: false, path: null       },
-  { icon: UserIcon,    label: "Profile",    badge: null,  active: false, path: "/profile" },
+  { icon: HomeIcon,    label: "Home",        badge: null,  active: true,  path: "/home"        },
+  { icon: BookOpenIcon,label: "My Library",  badge: "14",  active: false, path: null           },
+  { icon: HeartIcon,   label: "Favourites",  badge: "6",   active: false, path: null           },
+  { icon: CompassIcon, label: "Discover",    badge: null,  active: false, path: null           },
+  { icon: TrendingIcon,label: "Trending",    badge: null,  active: false, path: null           },
+  { icon: TrophyIcon,  label: "Leaderboard", badge: null,  active: false, path: "/leaderboard" },
+  { icon: UserIcon,    label: "Profile",     badge: null,  active: false, path: "/profile"     },
 ]
 
 /* ── Component ─────────────────────────────────────────────── */
@@ -156,6 +166,10 @@ const DashboardPage = () => {
         </div>
 
         <div className={styles.headerActions}>
+          <StreakBadge streak={35} active={true} />
+          <button className={styles.headerIconBtn} title="Leaderboard" onClick={() => navigate('/leaderboard')}>
+            <TrophyIcon />
+          </button>
           <button className={styles.headerIconBtn} title="Notifications">
             <BellIcon />
             <span className={styles.notifBadge} />

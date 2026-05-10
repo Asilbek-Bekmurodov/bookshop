@@ -272,7 +272,10 @@ const AdminDashboard = () => {
     setCatModal(null)
   }
 
-  const handleLogout = () => navigate('/login')
+  const handleLogout = () => {
+    sessionStorage.removeItem('adminAuth')
+    navigate('/admin/login')
+  }
 
   const NAV = [
     { id: 'overview',   label: 'Overview',   Icon: HomeIcon },

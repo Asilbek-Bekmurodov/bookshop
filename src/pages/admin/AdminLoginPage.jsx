@@ -32,6 +32,7 @@ const AdminLoginPage = () => {
   const handleSubmit = (e) => {
     e.preventDefault()
     if (email === 'admin@gmail.com' && password === 'admin123') {
+      sessionStorage.setItem('adminAuth', 'true')
       setError('')
       navigate('/admin')
     } else {

@@ -33,7 +33,11 @@ const LoginPage = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    if (email === 'user@gmail.com' && password === '123123') {
+    if (email === 'admin@gmail.com' && password === 'admin123') {
+      sessionStorage.setItem('adminAuth', 'true')
+      setError('')
+      navigate('/admin')
+    } else if (email === 'user@gmail.com' && password === '123123') {
       setError('')
       navigate('/home')
     } else {

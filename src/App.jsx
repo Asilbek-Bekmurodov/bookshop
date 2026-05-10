@@ -6,12 +6,11 @@ import ProfilePage from './pages/ProfilePage'
 import BookDetailPage from './pages/BookDetailPage'
 import LoginPage from './pages/auth/LoginPage'
 import RegisterPage from './pages/auth/RegisterPage'
-import AdminLoginPage from './pages/admin/AdminLoginPage'
 import AdminDashboard from './pages/admin/AdminDashboard'
 
 const AdminRoute = ({ children }) => {
   const isAdmin = sessionStorage.getItem('adminAuth') === 'true'
-  return isAdmin ? children : <Navigate to="/admin/login" replace />
+  return isAdmin ? children : <Navigate to="/login" replace />
 }
 
 function App() {
@@ -26,7 +25,6 @@ function App() {
       <Route path="/profile" element={<ProfilePage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
-      <Route path="/admin/login" element={<AdminLoginPage />} />
       <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
     </Routes>
   )

@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import styles from './NewArrivals.module.css'
 
 const books = [
@@ -105,11 +106,13 @@ const NewArrivals = () => {
 
       <div className={styles.booksGrid}>
         {books.map((book) => (
-          <div
+          <Link
+            to={`/books/${book.id}`}
             key={book.id}
             className={`${styles.bookCard} ${hoveredId === book.id ? styles.bookCardHovered : ''}`}
             onMouseEnter={() => setHoveredId(book.id)}
             onMouseLeave={() => setHoveredId(null)}
+            style={{ textDecoration: 'none', color: 'inherit' }}
           >
             <div className={`${styles.bookCover} ${styles[book.coverColor]}`}>
               <div className={styles.spine} />
@@ -139,7 +142,7 @@ const NewArrivals = () => {
               </div>
               <button className={styles.addToCart}>Add to Cart</button>
             </div>
-          </div>
+          </Link>
         ))}
       </div>
     </section>

@@ -1,0 +1,374 @@
+.section {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 40px 60px 80px;
+  background-color: #fff;
+}
+
+/* ── Header ── */
+.topRow {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  margin-bottom: 36px;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.headerGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.sectionLabel {
+  display: flex;
+  align-items: center;
+  font-size: 13px;
+  font-weight: 600;
+  color: #7cb97a;
+  margin: 0;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+}
+
+.heading {
+  font-size: 32px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin: 0;
+  letter-spacing: -0.5px;
+  line-height: 1.2;
+}
+
+.rightControls {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+/* ── Tabs ── */
+.tabs {
+  display: flex;
+  background: #f2f2f2;
+  border-radius: 50px;
+  padding: 4px;
+  gap: 2px;
+}
+
+.tab {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 18px;
+  border: none;
+  border-radius: 50px;
+  background: transparent;
+  font-size: 13px;
+  font-weight: 500;
+  color: #888;
+  cursor: pointer;
+  transition: all 0.22s ease;
+  white-space: nowrap;
+}
+
+.tab:hover {
+  color: #1a1a1a;
+}
+
+.tabActive {
+  background: #fff;
+  color: #1a1a1a;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.1);
+}
+
+.viewAllBtn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #1a1a1a;
+  background: none;
+  border: 1.5px solid #e8e8e8;
+  border-radius: 50px;
+  padding: 10px 20px;
+  cursor: pointer;
+  transition: border-color 0.2s ease, color 0.2s ease;
+  white-space: nowrap;
+}
+
+.viewAllBtn:hover {
+  border-color: #7cb97a;
+  color: #7cb97a;
+}
+
+/* ── Track (horizontal scroll) ── */
+.track {
+  overflow-x: auto;
+  overflow-y: visible;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  margin: 0 -8px;
+  padding: 4px 8px 16px;
+}
+
+.track::-webkit-scrollbar {
+  display: none;
+}
+
+.trackInner {
+  display: flex;
+  gap: 22px;
+  width: max-content;
+}
+
+/* ── Card shared ── */
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  cursor: pointer;
+  width: 180px;
+  flex-shrink: 0;
+  transition: transform 0.24s ease;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+}
+
+/* ── Audio Book Cover ── */
+.audioCover {
+  position: relative;
+  width: 180px;
+  height: 240px;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.18);
+  transition: box-shadow 0.24s ease;
+}
+
+.card:hover .audioCover {
+  box-shadow: 0 10px 34px rgba(0, 0, 0, 0.28);
+}
+
+/* Corner frame accent */
+.coverFrame {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  right: 12px;
+  bottom: 12px;
+  border: 1px solid;
+  border-radius: 6px;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Large initials */
+.coverInitials {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -52%);
+  font-size: 54px;
+  font-weight: 800;
+  letter-spacing: -3px;
+  opacity: 0.22;
+  z-index: 1;
+  user-select: none;
+  font-family: Georgia, 'Times New Roman', serif;
+  line-height: 1;
+}
+
+/* ── Podcast Cover ── */
+.podcastCover {
+  position: relative;
+  width: 180px;
+  height: 180px;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.18);
+  transition: box-shadow 0.24s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.card:hover .podcastCover {
+  box-shadow: 0 10px 34px rgba(0, 0, 0, 0.28);
+}
+
+.podcastRingOuter {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 130px;
+  height: 130px;
+  border-radius: 50%;
+  border: 1px solid;
+  pointer-events: none;
+}
+
+.podcastRingInner {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  border: 1px solid;
+  pointer-events: none;
+}
+
+.podcastMicIcon {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -58%);
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  border: 1.5px solid;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
+}
+
+/* Waveform at bottom of podcast card */
+.waveform {
+  position: absolute;
+  bottom: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: flex-end;
+  gap: 2.5px;
+  z-index: 1;
+}
+
+.waveBar {
+  width: 2px;
+  border-radius: 2px;
+  opacity: 0.65;
+}
+
+/* ── Play overlay (shared) ── */
+.playOverlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0);
+  transition: background 0.24s ease;
+  z-index: 3;
+}
+
+.card:hover .playOverlay {
+  background: rgba(0, 0, 0, 0.32);
+}
+
+.playBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  border: 1.5px solid;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  opacity: 0;
+  transform: scale(0.75);
+  transition: opacity 0.24s ease, transform 0.24s ease;
+}
+
+.card:hover .playBtn {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* Duration badge */
+.coverMeta {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  z-index: 4;
+}
+
+.durationBadge {
+  font-size: 10.5px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.9);
+  background: rgba(0, 0, 0, 0.48);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  padding: 3px 9px;
+  border-radius: 20px;
+  letter-spacing: 0.3px;
+}
+
+/* ── Card text ── */
+.cardText {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.cardCategory {
+  font-size: 11px;
+  font-weight: 600;
+  color: #7cb97a;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.cardTitle {
+  font-size: 14px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin: 0;
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.cardAuthor {
+  font-size: 13px;
+  color: #888;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  .section {
+    padding: 32px 20px 60px;
+  }
+
+  .heading {
+    font-size: 24px;
+  }
+
+  .topRow {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .rightControls {
+    width: 100%;
+    justify-content: space-between;
+  }
+}

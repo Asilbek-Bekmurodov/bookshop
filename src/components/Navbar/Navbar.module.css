@@ -137,6 +137,39 @@
   transition: background-color 0.3s ease, color 0.4s ease, border-color 0.4s ease;
 }
 
+.leaderboardBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  background: none;
+  cursor: pointer;
+  transition: background-color 0.25s ease, color 0.25s ease, border-color 0.25s ease;
+  flex-shrink: 0;
+}
+
+.leaderboardBtnTransparent {
+  color: rgba(255, 255, 255, 0.75);
+  border-color: rgba(255, 255, 255, 0.18);
+}
+.leaderboardBtnTransparent:hover {
+  background-color: rgba(255, 255, 255, 0.12);
+  color: #fff;
+}
+
+.leaderboardBtnSolid {
+  color: #555;
+  border-color: rgba(0, 0, 0, 0.1);
+}
+.leaderboardBtnSolid:hover {
+  background-color: rgba(251, 191, 36, 0.12);
+  color: #d97706;
+  border-color: rgba(217, 119, 6, 0.25);
+}
+
 @media (max-width: 768px) {
   .navbar {
     padding: 16px 24px;

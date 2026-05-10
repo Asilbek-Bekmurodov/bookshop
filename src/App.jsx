@@ -4,6 +4,7 @@ import HomePage from './pages/HomePage'
 import DashboardPage from './pages/DashboardPage'
 import ProfilePage from './pages/ProfilePage'
 import BookDetailPage from './pages/BookDetailPage'
+import BookReaderPage from './pages/BookReaderPage'
 import LoginPage from './pages/auth/LoginPage'
 import RegisterPage from './pages/auth/RegisterPage'
 import AdminDashboard from './pages/admin/AdminDashboard'
@@ -21,6 +22,7 @@ function App() {
         <Route path="/books/:id" element={<BookDetailPage />} />
         <Route path="*" element={<HomePage />} />
       </Route>
+      <Route path="/books/:id/read" element={<BookReaderPage />} />
       <Route path="/home" element={<DashboardPage />} />
       <Route path="/profile" element={<ProfilePage />} />
       <Route path="/login" element={<LoginPage />} />

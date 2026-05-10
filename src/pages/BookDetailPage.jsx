@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useParams, Link } from 'react-router-dom'
+import { useParams, Link, useNavigate } from 'react-router-dom'
 import styles from './BookDetailPage.module.css'
 
 const allBooks = [
@@ -18,6 +18,7 @@ const allBooks = [
     pages: 384,
     language: 'English',
     publisher: 'HarperCollins',
+    isFree: false,
     description:
       'In The Art of Thinking Clearly, Rolf Dobelli catalogues 99 of the most common thinking errors—from anchoring to the sunk cost fallacy—that prevent us from making better decisions in our lives, businesses, and politics. Simple and straightforward, this indispensable guide helps us recognize and avoid the cognitive biases, irrational thinking, and logical fallacies that all too often lead us astray.',
   },
@@ -27,15 +28,16 @@ const allBooks = [
     author: 'Cal Newport',
     rating: 4.9,
     reviews: 5234,
-    price: 19.99,
+    price: 0,
     originalPrice: null,
-    badge: 'New',
+    badge: 'Free',
     coverColor: 'purple',
     genre: 'Productivity',
     year: 2016,
     pages: 296,
     language: 'English',
     publisher: 'Grand Central Publishing',
+    isFree: true,
     description:
       "One of the most valuable skills in our economy is becoming increasingly rare. If you master this skill, you'll achieve extraordinary results. Deep work is the ability to focus without distraction on a cognitively demanding task—a skill that allows you to quickly master complicated information and produce better results in less time.",
   },
@@ -54,6 +56,7 @@ const allBooks = [
     pages: 288,
     language: 'English',
     publisher: 'Viking',
+    isFree: false,
     description:
       'Between life and death there is a library, and within that library, the shelves go on forever. Every book provides a chance to try another life you could have lived. To see how things would be if you had made other choices. Would you have done anything different, if you had the chance to undo your regrets?',
   },
@@ -72,6 +75,7 @@ const allBooks = [
     pages: 320,
     language: 'English',
     publisher: 'Avery',
+    isFree: false,
     description:
       'Tiny changes, remarkable results. No matter your goals, Atomic Habits offers a proven framework for improving—every day. James Clear reveals practical strategies that will teach you exactly how to form good habits, break bad ones, and master the tiny behaviors that lead to remarkable results.',
   },
@@ -81,15 +85,16 @@ const allBooks = [
     author: 'Andy Weir',
     rating: 4.8,
     reviews: 6789,
-    price: 18.99,
+    price: 0,
     originalPrice: 25.99,
-    badge: 'New',
+    badge: 'Free',
     coverColor: 'teal',
     genre: 'Sci-Fi',
     year: 2021,
     pages: 476,
     language: 'English',
     publisher: 'Ballantine Books',
+    isFree: true,
     description:
       'A lone astronaut must save the earth from disaster in this propulsive, gripping adventure from the author of The Martian. Ryland Grace is the sole survivor on a desperate, last-chance mission—and if he fails, humanity and the Earth itself will perish.',
   },
@@ -144,6 +149,7 @@ const StarRating = ({ rating, size }) => (
 
 const BookDetailPage = () => {
   const { id } = useParams()
+  const navigate = useNavigate()
   const [isWishlisted, setIsWishlisted] = useState(false)
   const [userRating, setUserRating] = useState(0)
   const [hoveredStar, setHoveredStar] = useState(0)
@@ -236,29 +242,40 @@ const BookDetailPage = () => {
           <hr className={styles.divider} />
 
           <div className={styles.priceBlock}>
-            <span className={styles.price}>${book.price}</span>
-            {book.originalPrice && (
+            {book.isFree ? (
+              <span className={styles.price} style={{ color: '#4a8f48' }}>Free</span>
+            ) : (
               <>
-                <span className={styles.originalPrice}>${book.originalPrice}</span>
-                <span className={styles.saveBadge}>Save {discountPct}%</span>
+                <span className={styles.price}>${book.price}</span>
+                {book.originalPrice && (
+                  <>
+                    <span className={styles.originalPrice}>${book.originalPrice}</span>
+                    <span className={styles.saveBadge}>Save {discountPct}%</span>
+                  </>
+                )}
               </>
             )}
           </div>
 
           <div className={styles.actionRow}>
-            <button className={styles.readBtn}>
-              <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.8"
-                className={styles.btnIcon}
+            {book.isFree && (
+              <button
+                className={styles.readBtn}
+                onClick={() => navigate(`/books/${book.id}/read`)}
               >
-                <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
-                <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
-              </svg>
-              Read Book
-            </button>
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.8"
+                  className={styles.btnIcon}
+                >
+                  <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
+                  <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
+                </svg>
+                Read Book
+              </button>
+            )}
 
             <button
               className={`${styles.wishlistBtn} ${isWishlisted ? styles.wishlisted : ''}`}
@@ -277,7 +294,9 @@ const BookDetailPage = () => {
             </button>
           </div>
 
-          <button className={styles.cartBtn}>Add to Cart — ${book.price}</button>
+          {!book.isFree && (
+            <button className={styles.cartBtn}>Add to Cart — ${book.price}</button>
+          )}
         </div>
       </section>
 

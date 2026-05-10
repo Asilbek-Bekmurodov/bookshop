@@ -21,11 +21,12 @@ const books = [
     author: 'Cal Newport',
     rating: 4.9,
     reviews: 5234,
-    price: 19.99,
+    price: 0,
     originalPrice: null,
-    badge: 'New',
+    badge: 'Free',
     coverColor: 'purple',
     genre: 'Productivity',
+    isFree: true,
   },
   {
     id: 3,
@@ -57,11 +58,12 @@ const books = [
     author: 'Andy Weir',
     rating: 4.8,
     reviews: 6789,
-    price: 18.99,
+    price: 0,
     originalPrice: 25.99,
-    badge: 'New',
+    badge: 'Free',
     coverColor: 'teal',
     genre: 'Sci-Fi',
+    isFree: true,
   },
 ]
 
@@ -135,12 +137,20 @@ const NewArrivals = () => {
               <p className={styles.bookAuthor}>{book.author}</p>
               <StarRating rating={book.rating} />
               <div className={styles.priceRow}>
-                <span className={styles.price}>${book.price}</span>
-                {book.originalPrice && (
-                  <span className={styles.originalPrice}>${book.originalPrice}</span>
+                {book.isFree ? (
+                  <span className={styles.price} style={{ color: '#4a8f48' }}>Free</span>
+                ) : (
+                  <>
+                    <span className={styles.price}>${book.price}</span>
+                    {book.originalPrice && (
+                      <span className={styles.originalPrice}>${book.originalPrice}</span>
+                    )}
+                  </>
                 )}
               </div>
-              <button className={styles.addToCart}>Add to Cart</button>
+              {!book.isFree && (
+                <button className={styles.addToCart}>Add to Cart</button>
+              )}
             </div>
           </Link>
         ))}

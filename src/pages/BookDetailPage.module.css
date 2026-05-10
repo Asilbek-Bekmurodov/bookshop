@@ -420,6 +420,11 @@
   color: #fff;
 }
 
+.badgeFree {
+  background: #7cb97a;
+  color: #fff;
+}
+
 /* ─── Stars ─────────────────────────────────────────────── */
 .stars {
   display: flex;

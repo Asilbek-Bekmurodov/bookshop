@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import styles from './DashboardPage.module.css'
+import AudioSection from '../components/AudioSection/AudioSection'
+import AudioPlayer from '../components/AudioPlayer/AudioPlayer'
 
 /* ── Icons ─────────────────────────────────────────────────── */
 const SearchIcon = () => (
@@ -97,6 +99,22 @@ const DashboardPage = () => {
   const [activeCategory, setActiveCategory] = useState("All")
   const [favorites, setFavorites] = useState(new Set([1, 6]))
   const [searchQuery, setSearchQuery] = useState('')
+  const [currentAudio, setCurrentAudio] = useState(null)
+  const [audioPlaylist, setAudioPlaylist] = useState([])
+
+  const handleAudioPlay = (item, playlist) => {
+    setCurrentAudio(item)
+    setAudioPlaylist(playlist)
+  }
+
+  const handleAudioClose = () => {
+    setCurrentAudio(null)
+    setAudioPlaylist([])
+  }
+
+  const handleSelectTrack = (item) => {
+    setCurrentAudio(item)
+  }
 
   const filteredBooks = BOOKS.filter(b => {
     const matchesCategory = activeCategory === "All" || b.category === activeCategory
@@ -309,8 +327,21 @@ const DashboardPage = () => {
             </div>
           )}
 
+          {/* Audio Section */}
+          <AudioSection onPlay={handleAudioPlay} />
+
         </main>
       </div>
+
+      {/* Audio Player */}
+      {currentAudio && (
+        <AudioPlayer
+          current={currentAudio}
+          playlist={audioPlaylist}
+          onClose={handleAudioClose}
+          onSelectTrack={handleSelectTrack}
+        />
+      )}
     </div>
   )
 }

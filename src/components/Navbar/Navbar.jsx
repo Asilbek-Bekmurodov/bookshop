@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import styles from './Navbar.module.css'
 import StreakBadge from '../StreakBadge/StreakBadge'
+import NotificationDropdown from './NotificationDropdown'
 
 const TrophyIcon = () => (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -46,6 +47,7 @@ const Navbar = () => {
 
       <div className={styles.authButtons}>
         <StreakBadge streak={35} active={true} />
+        <NotificationDropdown overVideo={overVideo} />
         <button
           className={`${styles.leaderboardBtn} ${overVideo ? styles.leaderboardBtnTransparent : styles.leaderboardBtnSolid}`}
           onClick={() => navigate('/leaderboard')}

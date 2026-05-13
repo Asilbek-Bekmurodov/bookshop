@@ -33,6 +33,7 @@ app.use(cookieParser());
 
 app.use('/api/auth', authRouter);
 app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+app.get('/api/docs.json', (req, res) => res.json(swaggerSpec));
 
 app.get('/', (req, res) => res.json({ message: 'Bookshop API ishlayapti', docs: '/api/docs' }));
 

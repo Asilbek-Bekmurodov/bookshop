@@ -1,4 +1,4 @@
-import { Routes, Route, Navigate } from 'react-router-dom'
+import { Routes, Route } from 'react-router-dom'
 import MainLayout from './layouts/MainLayout'
 import HomePage from './pages/HomePage'
 import DashboardPage from './pages/DashboardPage'
@@ -9,11 +9,7 @@ import LeaderboardPage from './pages/LeaderboardPage'
 import LoginPage from './pages/auth/LoginPage'
 import RegisterPage from './pages/auth/RegisterPage'
 import AdminDashboard from './pages/admin/AdminDashboard'
-
-const AdminRoute = ({ children }) => {
-  const isAdmin = sessionStorage.getItem('adminAuth') === 'true'
-  return isAdmin ? children : <Navigate to="/login" replace />
-}
+import PrivateRoute from './components/PrivateRoute'
 
 function App() {
   return (
@@ -24,12 +20,12 @@ function App() {
         <Route path="*" element={<HomePage />} />
       </Route>
       <Route path="/books/:id/read" element={<BookReaderPage />} />
-      <Route path="/home" element={<DashboardPage />} />
-      <Route path="/leaderboard" element={<LeaderboardPage />} />
-      <Route path="/profile" element={<ProfilePage />} />
+      <Route path="/home" element={<PrivateRoute><DashboardPage /></PrivateRoute>} />
+      <Route path="/leaderboard" element={<PrivateRoute><LeaderboardPage /></PrivateRoute>} />
+      <Route path="/profile" element={<PrivateRoute><ProfilePage /></PrivateRoute>} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
-      <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
+      <Route path="/admin" element={<PrivateRoute adminOnly><AdminDashboard /></PrivateRoute>} />
     </Routes>
   )
 }

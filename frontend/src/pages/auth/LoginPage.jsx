@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { loginUser } from "../../store/authSlice";
 import styles from "./Auth.module.css";
 
 const GoogleIcon = () => (
@@ -59,20 +61,16 @@ const LoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPwd, setShowPwd] = useState(false);
-  const [error, setError] = useState("");
+  const dispatch = useDispatch();
+  const { loading, error } = useSelector((s) => s.auth);
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (email === "admin@gmail.com" && password === "admin123") {
-      sessionStorage.setItem("adminAuth", "true");
-      setError("");
-      navigate("/admin");
-    } else if (email === "user@gmail.com" && password === "123123") {
-      setError("");
-      navigate("/home");
-    } else {
-      setError("Email yoki parol noto'g'ri. Iltimos, qaytadan urinib ko'ring.");
+    const result = await dispatch(loginUser({ email, password }));
+    if (loginUser.fulfilled.match(result)) {
+      const role = result.payload.user.role;
+      navigate(role === "admin" ? "/admin" : "/home", { replace: true });
     }
   };
 
@@ -180,8 +178,8 @@ const LoginPage = () => {
 
             {error && <p className={styles.errorMsg}>{error}</p>}
 
-            <button type="submit" className={styles.submitBtn}>
-              Sign in
+            <button type="submit" className={styles.submitBtn} disabled={loading}>
+              {loading ? "Kirilmoqda..." : "Sign in"}
             </button>
           </form>
 

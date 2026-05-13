@@ -1,5 +1,7 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import { useDispatch, useSelector } from 'react-redux'
+import { registerUser } from '../../store/authSlice'
 import styles from './Auth.module.css'
 
 const GoogleIcon = () => (
@@ -31,12 +33,17 @@ const RegisterPage = () => {
   const [confirm, setConfirm] = useState('')
   const [showPwd, setShowPwd] = useState(false)
   const [showConfirm, setShowConfirm] = useState(false)
+  const dispatch = useDispatch()
+  const { loading, error } = useSelector((s) => s.auth)
   const navigate = useNavigate()
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
     if (password !== confirm) return
-    navigate('/')
+    const result = await dispatch(registerUser({ name, email, password }))
+    if (registerUser.fulfilled.match(result)) {
+      navigate('/home', { replace: true })
+    }
   }
 
   const passwordsMatch = confirm === '' || password === confirm
@@ -178,8 +185,10 @@ const RegisterPage = () => {
               )}
             </div>
 
-            <button type="submit" className={styles.submitBtn}>
-              Create account
+            {error && <p className={styles.errorMsg}>{error}</p>}
+
+            <button type="submit" className={styles.submitBtn} disabled={loading || !passwordsMatch}>
+              {loading ? 'Yaratilmoqda...' : 'Create account'}
             </button>
 
           </form>

@@ -25,7 +25,50 @@ const setRefreshCookie = (res, token) => {
   });
 };
 
-// POST /api/auth/register  — faqat "user" role
+/**
+ * @swagger
+ * /api/auth/register:
+ *   post:
+ *     summary: Ro'yxatdan o'tish (faqat user role)
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [name, email, password]
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 example: Ali Karimov
+ *               email:
+ *                 type: string
+ *                 example: ali@example.com
+ *               password:
+ *                 type: string
+ *                 minLength: 8
+ *                 example: parol123
+ *     responses:
+ *       201:
+ *         description: Muvaffaqiyatli ro'yxatdan o'tish
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/AuthResponse'
+ *       400:
+ *         description: Noto'g'ri ma'lumot
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *       409:
+ *         description: Email allaqachon mavjud
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ */
 router.post('/register', async (req, res) => {
   try {
     const { name, email, password } = req.body;
@@ -52,7 +95,40 @@ router.post('/register', async (req, res) => {
   }
 });
 
-// POST /api/auth/login
+/**
+ * @swagger
+ * /api/auth/login:
+ *   post:
+ *     summary: Tizimga kirish
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [email, password]
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 example: ali@example.com
+ *               password:
+ *                 type: string
+ *                 example: parol123
+ *     responses:
+ *       200:
+ *         description: Muvaffaqiyatli kirish. refreshToken httpOnly cookie da qaytadi.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/AuthResponse'
+ *       401:
+ *         description: Email yoki parol noto'g'ri
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ */
 router.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -75,7 +151,27 @@ router.post('/login', async (req, res) => {
   }
 });
 
-// POST /api/auth/refresh
+/**
+ * @swagger
+ * /api/auth/refresh:
+ *   post:
+ *     summary: Yangi access token olish
+ *     tags: [Auth]
+ *     description: refreshToken httpOnly cookie orqali yuboriladi. Yangi access token + rotated refresh token qaytaradi.
+ *     responses:
+ *       200:
+ *         description: Yangi tokenlar
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/AuthResponse'
+ *       401:
+ *         description: Refresh token yo'q yoki yaroqsiz
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ */
 router.post('/refresh', async (req, res) => {
   try {
     const token = req.cookies.refreshToken;
@@ -99,7 +195,25 @@ router.post('/refresh', async (req, res) => {
   }
 });
 
-// POST /api/auth/logout
+/**
+ * @swagger
+ * /api/auth/logout:
+ *   post:
+ *     summary: Tizimdan chiqish
+ *     tags: [Auth]
+ *     description: refreshToken cookie ni o'chiradi va DB dan tokenni o'chiradi.
+ *     responses:
+ *       200:
+ *         description: Muvaffaqiyatli chiqish
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Chiqildi
+ */
 router.post('/logout', async (req, res) => {
   try {
     const token = req.cookies.refreshToken;
@@ -118,7 +232,31 @@ router.post('/logout', async (req, res) => {
   res.json({ message: 'Chiqildi' });
 });
 
-// GET /api/auth/me
+/**
+ * @swagger
+ * /api/auth/me:
+ *   get:
+ *     summary: Joriy foydalanuvchi ma'lumoti
+ *     tags: [Auth]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Foydalanuvchi ma'lumoti
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 user:
+ *                   $ref: '#/components/schemas/User'
+ *       401:
+ *         description: Token yo'q yoki yaroqsiz
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ */
 router.get('/me', protect, async (req, res) => {
   const user = await User.findById(req.user.id);
   if (!user) return res.status(404).json({ message: 'Topilmadi' });

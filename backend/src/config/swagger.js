@@ -9,6 +9,7 @@ const options = {
       description: 'Bookshop loyihasi uchun REST API dokumentatsiyasi',
     },
     servers: [
+      { url: 'https://bookshop-u08d.onrender.com', description: 'Production server' },
       { url: 'http://localhost:5001', description: 'Local server' },
     ],
     components: {

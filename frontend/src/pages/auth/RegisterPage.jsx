@@ -26,11 +26,19 @@ const EyeOff = () => (
   </svg>
 )
 
+const GENRES = [
+  'Fiction', 'Non-fiction', 'Mystery', 'Science Fiction',
+  'Fantasy', 'Romance', 'History', 'Self-help', 'Thriller', 'Biography',
+]
+
 const RegisterPage = () => {
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirm, setConfirm] = useState('')
+  const [age, setAge] = useState('')
+  const [favAuthor, setFavAuthor] = useState('')
+  const [favGenre, setFavGenre] = useState('')
   const [showPwd, setShowPwd] = useState(false)
   const [showConfirm, setShowConfirm] = useState(false)
   const dispatch = useDispatch()
@@ -40,7 +48,11 @@ const RegisterPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault()
     if (password !== confirm) return
-    const result = await dispatch(registerUser({ name, email, password }))
+    const payload = { name, email, password }
+    if (age) payload.age = Number(age)
+    if (favAuthor.trim()) payload.favAuthor = favAuthor.trim()
+    if (favGenre) payload.favGenre = favGenre
+    const result = await dispatch(registerUser(payload))
     if (registerUser.fulfilled.match(result)) {
       navigate('/home', { replace: true })
     }
@@ -183,6 +195,66 @@ const RegisterPage = () => {
               {!passwordsMatch && (
                 <span className={styles.errorMsg}>Passwords don't match</span>
               )}
+            </div>
+
+            {/* ── Reading Preferences ── */}
+            <div className={styles.sectionDivider}>
+              <span className={styles.sectionLabel}>
+                <span className={styles.sectionIcon}>📚</span>
+                Reading Preferences
+              </span>
+            </div>
+
+            <div className={styles.twoCol}>
+              <div className={styles.field}>
+                <label className={styles.label}>
+                  <span className={styles.labelWrap}>
+                    Age <span className={styles.optBadge}>optional</span>
+                  </span>
+                </label>
+                <input
+                  type="number"
+                  className={styles.input}
+                  placeholder="e.g. 24"
+                  value={age}
+                  onChange={e => setAge(e.target.value)}
+                  min={5}
+                  max={120}
+                />
+              </div>
+
+              <div className={styles.field}>
+                <label className={styles.label}>
+                  <span className={styles.labelWrap}>
+                    Fav Author <span className={styles.optBadge}>optional</span>
+                  </span>
+                </label>
+                <input
+                  type="text"
+                  className={styles.input}
+                  placeholder="e.g. Dostoevsky"
+                  value={favAuthor}
+                  onChange={e => setFavAuthor(e.target.value)}
+                />
+              </div>
+            </div>
+
+            <div className={styles.field}>
+              <label className={styles.label}>
+                <span className={styles.labelWrap}>
+                  Favorite Genre <span className={styles.optBadge}>optional</span>
+                </span>
+              </label>
+              <select
+                className={styles.select}
+                value={favGenre}
+                onChange={e => setFavGenre(e.target.value)}
+              >
+                <option value=''>Select a genre…</option>
+                {GENRES.map(g => (
+                  <option key={g} value={g}>{g}</option>
+                ))}
+              </select>
             </div>
 
             {error && <p className={styles.errorMsg}>{error}</p>}

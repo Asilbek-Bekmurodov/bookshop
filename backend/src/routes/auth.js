@@ -49,6 +49,18 @@ const setRefreshCookie = (res, token) => {
  *                 type: string
  *                 minLength: 8
  *                 example: parol123
+ *               age:
+ *                 type: integer
+ *                 minimum: 5
+ *                 maximum: 120
+ *                 example: 25
+ *               favAuthor:
+ *                 type: string
+ *                 example: Fyodor Dostoevsky
+ *               favGenre:
+ *                 type: string
+ *                 enum: [Fiction, Non-fiction, Mystery, Science Fiction, Fantasy, Romance, History, Self-help, Thriller, Biography]
+ *                 example: Fiction
  *     responses:
  *       201:
  *         description: Muvaffaqiyatli ro'yxatdan o'tish
@@ -71,7 +83,7 @@ const setRefreshCookie = (res, token) => {
  */
 router.post('/register', async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const { name, email, password, age, favAuthor, favGenre } = req.body;
     if (!name || !email || !password)
       return res.status(400).json({ message: 'Barcha maydonlarni to\'ldiring' });
     if (password.length < 8)
@@ -81,7 +93,12 @@ router.post('/register', async (req, res) => {
       return res.status(409).json({ message: 'Bu email allaqachon ro\'yxatdan o\'tgan' });
 
     const passwordHash = await bcrypt.hash(password, 12);
-    const user = await User.create({ name, email, passwordHash, role: 'user' });
+    const user = await User.create({
+      name, email, passwordHash, role: 'user',
+      age: age || null,
+      favAuthor: favAuthor || null,
+      favGenre: favGenre || null,
+    });
 
     const accessToken = signAccess(user);
     const refreshToken = signRefresh(user);

@@ -204,15 +204,18 @@
 .form {
   flex: 1;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
   padding: 48px 24px;
   background: #fafaf8;
+  overflow-y: auto;
+  min-height: 100vh;
 }
 
 .formInner {
   width: 100%;
-  max-width: 408px;
+  max-width: 420px;
+  padding-top: 16px;
 }
 
 /* Back link */
@@ -417,13 +420,301 @@
   margin-top: -2px;
 }
 
-/* ── Section divider (Reading Preferences) ── */
+/* ── Step indicator ── */
+.stepIndicator {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  margin-bottom: 36px;
+}
+
+.stepItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.stepDot {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1.5px solid #e0e0db;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 700;
+  color: #ccc;
+  letter-spacing: 0.5px;
+  transition: all 0.3s ease;
+  background: #fff;
+}
+
+.stepActive .stepDot {
+  border-color: #7cb97a;
+  color: #7cb97a;
+  background: rgba(124, 185, 122, 0.06);
+}
+
+.stepDone .stepDot {
+  border-color: #7cb97a;
+  background: #7cb97a;
+  color: #fff;
+}
+
+.stepName {
+  font-size: 11px;
+  font-weight: 700;
+  color: #ccc;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  transition: color 0.3s ease;
+}
+
+.stepActive .stepName {
+  color: #555;
+}
+
+.stepLine {
+  flex: 1;
+  height: 1.5px;
+  background: #ebebE6;
+  margin: 0 12px;
+  position: relative;
+  overflow: hidden;
+}
+
+.stepLineFill {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 0;
+  background: #7cb97a;
+  transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.stepLineFull {
+  width: 100%;
+}
+
+/* ── Step panel animation ── */
+.stepPanel {
+  animation: slideUp 0.4s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+.slideInRight {
+  animation: slideInFromRight 0.38s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+.slideInLeft {
+  animation: slideInFromLeft 0.38s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+/* ── Optional badge & label wrap ── */
+.labelWrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.optBadge {
+  font-size: 9px;
+  font-weight: 600;
+  color: #bbb;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  background: #f0f0ec;
+  border-radius: 4px;
+  padding: 1px 6px;
+}
+
+/* ── Field hint ── */
+.fieldHint {
+  font-size: 11px;
+  color: #c0c0b8;
+  margin-top: -2px;
+  font-weight: 400;
+}
+
+/* ── Author tag-input ── */
+.tagInputWrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+  padding: 8px 12px;
+  background: #f2f2ee;
+  border: 1.5px solid transparent;
+  border-radius: 12px;
+  min-height: 46px;
+  cursor: text;
+  transition: border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+}
+
+.tagInputWrap:focus-within {
+  background: #fff;
+  border-color: #7cb97a;
+  box-shadow: 0 0 0 4px rgba(124, 185, 122, 0.1);
+}
+
+.authorTag {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px 3px 10px;
+  background: #fff;
+  border: 1px solid #e0e0db;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #333;
+  white-space: nowrap;
+  animation: tagPop 0.2s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+.tagRemove {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #bbb;
+  font-size: 15px;
+  line-height: 1;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  transition: color 0.15s ease;
+}
+
+.tagRemove:hover { color: #e85a5a; }
+
+.tagInput {
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 13px;
+  color: #1a1a1a;
+  flex: 1;
+  min-width: 120px;
+  padding: 2px 0;
+}
+
+.tagInput::placeholder { color: #c8c8c0; }
+
+/* ── Genre grid ── */
+.genreGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+
+.genreCard {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 14px 10px 12px;
+  background: var(--genre-bg, #f2f2ee);
+  border: 1.5px solid transparent;
+  border-radius: 14px;
+  cursor: pointer;
+  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease, background 0.18s ease;
+  text-align: center;
+  outline: none;
+  animation: slideUp 0.4s ease both;
+}
+
+.genreCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.07);
+}
+
+.genreCard:active {
+  transform: translateY(0);
+}
+
+.genreSelected {
+  border-color: #7cb97a;
+  background: rgba(124, 185, 122, 0.07) !important;
+  box-shadow: 0 0 0 3px rgba(124, 185, 122, 0.12);
+}
+
+.genreIcon {
+  font-size: 22px;
+  line-height: 1;
+  display: block;
+}
+
+.genreName {
+  font-size: 11px;
+  font-weight: 700;
+  color: #444;
+  letter-spacing: 0.3px;
+  line-height: 1.2;
+}
+
+.genreCheck {
+  position: absolute;
+  top: 7px;
+  right: 8px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #7cb97a;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: checkPop 0.22s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+/* ── Step 2 action row ── */
+.stepActions {
+  display: flex;
+  gap: 10px;
+  align-items: stretch;
+  margin-top: 4px;
+}
+
+.backBtn {
+  padding: 15px 20px;
+  background: #f2f2ee;
+  color: #666;
+  border: none;
+  border-radius: 14px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  letter-spacing: 0.2px;
+  transition: background 0.2s ease, color 0.2s ease;
+  white-space: nowrap;
+}
+
+.backBtn:hover {
+  background: #e8e8e4;
+  color: #333;
+}
+
+/* ── Compact input (age field) ── */
+.inputCompact {
+  max-width: 160px;
+}
+
+/* ── Scroll container for step 2 ── */
+.formScrollable {
+  overflow-y: auto;
+  align-items: flex-start !important;
+}
+
+/* ── Section divider (legacy — kept for other uses) ── */
 .sectionDivider {
   display: flex;
   align-items: center;
   gap: 12px;
   margin: 4px 0 2px;
-  animation: slideUp 0.5s ease 0.33s both;
 }
 
 .sectionDivider::before,
@@ -451,60 +742,25 @@
   line-height: 1;
 }
 
-/* Two column grid for smaller fields */
-.twoCol {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
+/* ── Keyframes ── */
+@keyframes slideInFromRight {
+  from { opacity: 0; transform: translateX(32px); }
+  to   { opacity: 1; transform: translateX(0); }
 }
 
-/* Optional badge */
-.labelWrap {
-  display: flex;
-  align-items: center;
-  gap: 6px;
+@keyframes slideInFromLeft {
+  from { opacity: 0; transform: translateX(-32px); }
+  to   { opacity: 1; transform: translateX(0); }
 }
 
-.optBadge {
-  font-size: 9px;
-  font-weight: 600;
-  color: #bbb;
-  letter-spacing: 0.8px;
-  text-transform: uppercase;
-  background: #f0f0ec;
-  border-radius: 4px;
-  padding: 1px 5px;
+@keyframes tagPop {
+  from { opacity: 0; transform: scale(0.8); }
+  to   { opacity: 1; transform: scale(1); }
 }
 
-/* Styled select — matches .input */
-.select {
-  width: 100%;
-  padding: 13px 36px 13px 16px;
-  background: #f2f2ee;
-  border: 1.5px solid transparent;
-  border-radius: 12px;
-  font-size: 14px;
-  color: #1a1a1a;
-  outline: none;
-  appearance: none;
-  -webkit-appearance: none;
-  cursor: pointer;
-  transition: border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
-  box-sizing: border-box;
-  font-weight: 400;
-  background-image: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L6 7L11 1' stroke='%23c0c0b8' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 14px center;
-}
-
-.select:focus {
-  background-color: #fff;
-  border-color: #7cb97a;
-  box-shadow: 0 0 0 4px rgba(124, 185, 122, 0.1);
-}
-
-.select option[value=''] {
-  color: #c8c8c0;
+@keyframes checkPop {
+  from { opacity: 0; transform: scale(0.5); }
+  to   { opacity: 1; transform: scale(1); }
 }
 
 /* Submit */

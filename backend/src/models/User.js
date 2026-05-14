@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
 
-const GENRES = [
+const VALID_GENRES = [
   'Fiction', 'Non-fiction', 'Mystery', 'Science Fiction',
   'Fantasy', 'Romance', 'History', 'Self-help', 'Thriller', 'Biography',
 ];
@@ -14,8 +14,8 @@ const userSchema = new mongoose.Schema(
     role: { type: String, enum: ['user', 'admin'], default: 'user' },
     refreshTokens: [String],
     age: { type: Number, min: 5, max: 120, default: null },
-    favAuthor: { type: String, trim: true, default: null },
-    favGenre: { type: String, enum: [...GENRES, null], default: null },
+    favAuthors: { type: [String], default: [] },
+    favGenres: { type: [{ type: String, enum: VALID_GENRES }], default: [] },
   },
   { timestamps: true }
 );
@@ -31,8 +31,8 @@ userSchema.methods.toSafeObject = function () {
     email: this.email,
     role: this.role,
     age: this.age,
-    favAuthor: this.favAuthor,
-    favGenre: this.favGenre,
+    favAuthors: this.favAuthors,
+    favGenres: this.favGenres,
   };
 };
 

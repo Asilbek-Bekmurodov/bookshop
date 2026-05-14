@@ -26,39 +26,111 @@ const EyeOff = () => (
   </svg>
 )
 
+const CheckIcon = () => (
+  <svg width="10" height="10" viewBox="0 0 12 12" fill="none">
+    <path d="M2 6L5 9L10 3" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+  </svg>
+)
+
 const GENRES = [
-  'Fiction', 'Non-fiction', 'Mystery', 'Science Fiction',
-  'Fantasy', 'Romance', 'History', 'Self-help', 'Thriller', 'Biography',
+  { name: 'Fiction',         icon: '📖', bg: '#f0ede8' },
+  { name: 'Non-fiction',     icon: '🔬', bg: '#eaf0eb' },
+  { name: 'Mystery',         icon: '🔍', bg: '#ede8f0' },
+  { name: 'Science Fiction', icon: '🚀', bg: '#e8edf0' },
+  { name: 'Fantasy',         icon: '✨', bg: '#f0ede4' },
+  { name: 'Romance',         icon: '🌹', bg: '#f0e8eb' },
+  { name: 'History',         icon: '🏛️', bg: '#ede9e0' },
+  { name: 'Self-help',       icon: '🧠', bg: '#eaf0e8' },
+  { name: 'Thriller',        icon: '⚡', bg: '#f0eae8' },
+  { name: 'Biography',       icon: '👤', bg: '#e8ecf0' },
 ]
 
+const PANEL_CONTENT = {
+  1: {
+    quote: 'Not all those who wander are lost — but all those who read are found.',
+    cite: '— Adapted from Tolkien',
+  },
+  2: {
+    quote: 'Tell me what you read and I will tell you who you are.',
+    cite: '— François Mauriac',
+  },
+}
+
 const RegisterPage = () => {
+  const [step, setStep] = useState(1)
+  const [direction, setDirection] = useState('forward')
+
+  // Step 1
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirm, setConfirm] = useState('')
-  const [age, setAge] = useState('')
-  const [favAuthor, setFavAuthor] = useState('')
-  const [favGenre, setFavGenre] = useState('')
   const [showPwd, setShowPwd] = useState(false)
   const [showConfirm, setShowConfirm] = useState(false)
+
+  // Step 2
+  const [age, setAge] = useState('')
+  const [authorInput, setAuthorInput] = useState('')
+  const [authors, setAuthors] = useState([])
+  const [genres, setGenres] = useState([])
+
   const dispatch = useDispatch()
   const { loading, error } = useSelector((s) => s.auth)
   const navigate = useNavigate()
 
-  const handleSubmit = async (e) => {
+  const passwordsMatch = confirm === '' || password === confirm
+
+  const goToStep2 = (e) => {
     e.preventDefault()
     if (password !== confirm) return
+    setDirection('forward')
+    setStep(2)
+  }
+
+  const goBack = () => {
+    setDirection('back')
+    setStep(1)
+  }
+
+  const addAuthor = () => {
+    const trimmed = authorInput.trim().replace(/,$/, '')
+    if (trimmed && !authors.includes(trimmed)) {
+      setAuthors(prev => [...prev, trimmed])
+    }
+    setAuthorInput('')
+  }
+
+  const handleAuthorKeyDown = (e) => {
+    if (e.key === 'Enter' || e.key === ',') {
+      e.preventDefault()
+      addAuthor()
+    }
+    if (e.key === 'Backspace' && !authorInput && authors.length) {
+      setAuthors(prev => prev.slice(0, -1))
+    }
+  }
+
+  const toggleGenre = (name) => {
+    setGenres(prev =>
+      prev.includes(name) ? prev.filter(g => g !== name) : [...prev, name]
+    )
+  }
+
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    if (authorInput.trim()) addAuthor()
     const payload = { name, email, password }
     if (age) payload.age = Number(age)
-    if (favAuthor.trim()) payload.favAuthor = favAuthor.trim()
-    if (favGenre) payload.favGenre = favGenre
+    if (authors.length) payload.favAuthors = authors
+    if (genres.length) payload.favGenres = genres
     const result = await dispatch(registerUser(payload))
     if (registerUser.fulfilled.match(result)) {
       navigate('/home', { replace: true })
     }
   }
 
-  const passwordsMatch = confirm === '' || password === confirm
+  const { quote, cite } = PANEL_CONTENT[step]
+  const slideClass = direction === 'forward' ? styles.slideInRight : styles.slideInLeft
 
   return (
     <div className={styles.auth}>
@@ -79,10 +151,8 @@ const RegisterPage = () => {
 
           <blockquote className={styles.quote}>
             <span className={styles.quoteMark}>"</span>
-            <p className={styles.quoteText}>
-              Not all those who wander are lost — but all those who read are found.
-            </p>
-            <cite className={styles.quoteCite}>— Adapted from Tolkien</cite>
+            <p className={styles.quoteText}>{quote}</p>
+            <cite className={styles.quoteCite}>{cite}</cite>
           </blockquote>
 
           <div className={styles.panelStats}>
@@ -107,168 +177,233 @@ const RegisterPage = () => {
       <div className={styles.form}>
         <div className={styles.formInner}>
 
-          <Link to="/" className={styles.backLink}>
-            ← Back to home
-          </Link>
+          <Link to="/" className={styles.backLink}>← Back to home</Link>
 
-          <div className={styles.formHeader}>
-            <h1 className={styles.title}>Create account</h1>
-            <p className={styles.subtitle}>Join your reading community today</p>
+          {/* Step indicator */}
+          <div className={styles.stepIndicator}>
+            <div className={`${styles.stepItem} ${styles.stepActive} ${step > 1 ? styles.stepDone : ''}`}>
+              <div className={styles.stepDot}>
+                {step > 1 ? <CheckIcon /> : '01'}
+              </div>
+              <span className={styles.stepName}>Account</span>
+            </div>
+            <div className={styles.stepLine}>
+              <div className={`${styles.stepLineFill} ${step >= 2 ? styles.stepLineFull : ''}`} />
+            </div>
+            <div className={`${styles.stepItem} ${step >= 2 ? styles.stepActive : ''}`}>
+              <div className={styles.stepDot}>02</div>
+              <span className={styles.stepName}>Taste</span>
+            </div>
           </div>
 
-          <button className={styles.googleBtn} type="button">
-            <GoogleIcon />
-            <span>Continue with Google</span>
-          </button>
+          {/* ── Step 1: Account info ── */}
+          {step === 1 && (
+            <div key="step1" className={`${styles.stepPanel} ${slideClass}`}>
 
-          <div className={styles.divider}>
-            <span>or continue with email</span>
-          </div>
+              <div className={styles.formHeader}>
+                <h1 className={styles.title}>Create account</h1>
+                <p className={styles.subtitle}>Join your reading community today</p>
+              </div>
 
-          <form className={styles.fields} onSubmit={handleSubmit}>
+              <button className={styles.googleBtn} type="button">
+                <GoogleIcon />
+                <span>Continue with Google</span>
+              </button>
 
-            <div className={styles.field}>
-              <label className={styles.label}>Full name</label>
-              <input
-                type="text"
-                className={styles.input}
-                placeholder="John Doe"
-                value={name}
-                onChange={e => setName(e.target.value)}
-                required
-              />
-            </div>
+              <div className={styles.divider}>
+                <span>or continue with email</span>
+              </div>
 
-            <div className={styles.field}>
-              <label className={styles.label}>Email address</label>
-              <input
-                type="email"
-                className={styles.input}
-                placeholder="you@example.com"
-                value={email}
-                onChange={e => setEmail(e.target.value)}
-                required
-              />
-            </div>
+              <form className={styles.fields} onSubmit={goToStep2}>
 
-            <div className={styles.field}>
-              <label className={styles.label}>Password</label>
-              <div className={styles.inputWrap}>
-                <input
-                  type={showPwd ? 'text' : 'password'}
-                  className={styles.input}
-                  placeholder="Min. 8 characters"
-                  value={password}
-                  onChange={e => setPassword(e.target.value)}
-                  minLength={8}
-                  required
-                />
-                <button
-                  type="button"
-                  className={styles.eyeBtn}
-                  onClick={() => setShowPwd(v => !v)}
-                >
-                  {showPwd ? <EyeOff /> : <EyeOn />}
+                <div className={styles.field}>
+                  <label className={styles.label}>Full name</label>
+                  <input
+                    type="text"
+                    className={styles.input}
+                    placeholder="John Doe"
+                    value={name}
+                    onChange={e => setName(e.target.value)}
+                    required
+                  />
+                </div>
+
+                <div className={styles.field}>
+                  <label className={styles.label}>Email address</label>
+                  <input
+                    type="email"
+                    className={styles.input}
+                    placeholder="you@example.com"
+                    value={email}
+                    onChange={e => setEmail(e.target.value)}
+                    required
+                  />
+                </div>
+
+                <div className={styles.field}>
+                  <label className={styles.label}>Password</label>
+                  <div className={styles.inputWrap}>
+                    <input
+                      type={showPwd ? 'text' : 'password'}
+                      className={styles.input}
+                      placeholder="Min. 8 characters"
+                      value={password}
+                      onChange={e => setPassword(e.target.value)}
+                      minLength={8}
+                      required
+                    />
+                    <button type="button" className={styles.eyeBtn} onClick={() => setShowPwd(v => !v)}>
+                      {showPwd ? <EyeOff /> : <EyeOn />}
+                    </button>
+                  </div>
+                </div>
+
+                <div className={styles.field}>
+                  <label className={styles.label}>Confirm password</label>
+                  <div className={styles.inputWrap}>
+                    <input
+                      type={showConfirm ? 'text' : 'password'}
+                      className={`${styles.input} ${!passwordsMatch ? styles.inputError : ''}`}
+                      placeholder="Repeat your password"
+                      value={confirm}
+                      onChange={e => setConfirm(e.target.value)}
+                      required
+                    />
+                    <button type="button" className={styles.eyeBtn} onClick={() => setShowConfirm(v => !v)}>
+                      {showConfirm ? <EyeOff /> : <EyeOn />}
+                    </button>
+                  </div>
+                  {!passwordsMatch && (
+                    <span className={styles.errorMsg}>Passwords don't match</span>
+                  )}
+                </div>
+
+                <button type="submit" className={styles.submitBtn} disabled={!passwordsMatch}>
+                  Continue →
                 </button>
-              </div>
-            </div>
 
-            <div className={styles.field}>
-              <label className={styles.label}>Confirm password</label>
-              <div className={styles.inputWrap}>
-                <input
-                  type={showConfirm ? 'text' : 'password'}
-                  className={`${styles.input} ${!passwordsMatch ? styles.inputError : ''}`}
-                  placeholder="Repeat your password"
-                  value={confirm}
-                  onChange={e => setConfirm(e.target.value)}
-                  required
-                />
-                <button
-                  type="button"
-                  className={styles.eyeBtn}
-                  onClick={() => setShowConfirm(v => !v)}
-                >
-                  {showConfirm ? <EyeOff /> : <EyeOn />}
-                </button>
-              </div>
-              {!passwordsMatch && (
-                <span className={styles.errorMsg}>Passwords don't match</span>
-              )}
-            </div>
+              </form>
 
-            {/* ── Reading Preferences ── */}
-            <div className={styles.sectionDivider}>
-              <span className={styles.sectionLabel}>
-                <span className={styles.sectionIcon}>📚</span>
-                Reading Preferences
-              </span>
-            </div>
+              <p className={styles.switchText}>
+                Already have an account?{' '}
+                <Link to="/login" className={styles.switchLink}>Sign in</Link>
+              </p>
 
-            <div className={styles.twoCol}>
-              <div className={styles.field}>
-                <label className={styles.label}>
-                  <span className={styles.labelWrap}>
-                    Age <span className={styles.optBadge}>optional</span>
-                  </span>
-                </label>
-                <input
-                  type="number"
-                  className={styles.input}
-                  placeholder="e.g. 24"
-                  value={age}
-                  onChange={e => setAge(e.target.value)}
-                  min={5}
-                  max={120}
-                />
+            </div>
+          )}
+
+          {/* ── Step 2: Reading preferences ── */}
+          {step === 2 && (
+            <div key="step2" className={`${styles.stepPanel} ${slideClass}`}>
+
+              <div className={styles.formHeader}>
+                <h1 className={styles.title}>Your reading taste</h1>
+                <p className={styles.subtitle}>Help us personalise your bookshelf</p>
               </div>
 
-              <div className={styles.field}>
-                <label className={styles.label}>
-                  <span className={styles.labelWrap}>
-                    Fav Author <span className={styles.optBadge}>optional</span>
-                  </span>
-                </label>
-                <input
-                  type="text"
-                  className={styles.input}
-                  placeholder="e.g. Dostoevsky"
-                  value={favAuthor}
-                  onChange={e => setFavAuthor(e.target.value)}
-                />
-              </div>
+              <form className={styles.fields} onSubmit={handleSubmit}>
+
+                {/* Age */}
+                <div className={styles.field}>
+                  <label className={styles.label}>
+                    <span className={styles.labelWrap}>
+                      Age <span className={styles.optBadge}>optional</span>
+                    </span>
+                  </label>
+                  <input
+                    type="number"
+                    className={`${styles.input} ${styles.inputCompact}`}
+                    placeholder="e.g. 24"
+                    value={age}
+                    onChange={e => setAge(e.target.value)}
+                    min={5}
+                    max={120}
+                  />
+                </div>
+
+                {/* Favorite Authors — tag input */}
+                <div className={styles.field}>
+                  <label className={styles.label}>
+                    <span className={styles.labelWrap}>
+                      Favorite Authors <span className={styles.optBadge}>optional</span>
+                    </span>
+                  </label>
+                  <div className={styles.tagInputWrap}>
+                    {authors.map(author => (
+                      <span key={author} className={styles.authorTag}>
+                        {author}
+                        <button
+                          type="button"
+                          className={styles.tagRemove}
+                          onClick={() => setAuthors(prev => prev.filter(a => a !== author))}
+                        >
+                          ×
+                        </button>
+                      </span>
+                    ))}
+                    <input
+                      type="text"
+                      className={styles.tagInput}
+                      placeholder={authors.length ? 'Add more…' : 'Type name, press Enter'}
+                      value={authorInput}
+                      onChange={e => setAuthorInput(e.target.value)}
+                      onKeyDown={handleAuthorKeyDown}
+                      onBlur={addAuthor}
+                    />
+                  </div>
+                  <span className={styles.fieldHint}>Press Enter or comma to add each author</span>
+                </div>
+
+                {/* Favorite Genres — multi-select cards */}
+                <div className={styles.field}>
+                  <label className={styles.label}>
+                    <span className={styles.labelWrap}>
+                      Favorite Genres <span className={styles.optBadge}>optional · multi-select</span>
+                    </span>
+                  </label>
+                  <div className={styles.genreGrid}>
+                    {GENRES.map((genre, i) => (
+                      <button
+                        key={genre.name}
+                        type="button"
+                        className={`${styles.genreCard} ${genres.includes(genre.name) ? styles.genreSelected : ''}`}
+                        style={{
+                          '--genre-bg': genre.bg,
+                          animationDelay: `${i * 0.04}s`,
+                          background: genres.includes(genre.name) ? undefined : genre.bg,
+                        }}
+                        onClick={() => toggleGenre(genre.name)}
+                      >
+                        <span className={styles.genreIcon}>{genre.icon}</span>
+                        <span className={styles.genreName}>{genre.name}</span>
+                        {genres.includes(genre.name) && (
+                          <span className={styles.genreCheck}><CheckIcon /></span>
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {error && <p className={styles.errorMsg}>{error}</p>}
+
+                <div className={styles.stepActions}>
+                  <button type="button" className={styles.backBtn} onClick={goBack}>
+                    ← Back
+                  </button>
+                  <button
+                    type="submit"
+                    className={styles.submitBtn}
+                    disabled={loading}
+                    style={{ flex: 1 }}
+                  >
+                    {loading ? 'Creating…' : 'Create account'}
+                  </button>
+                </div>
+
+              </form>
+
             </div>
-
-            <div className={styles.field}>
-              <label className={styles.label}>
-                <span className={styles.labelWrap}>
-                  Favorite Genre <span className={styles.optBadge}>optional</span>
-                </span>
-              </label>
-              <select
-                className={styles.select}
-                value={favGenre}
-                onChange={e => setFavGenre(e.target.value)}
-              >
-                <option value=''>Select a genre…</option>
-                {GENRES.map(g => (
-                  <option key={g} value={g}>{g}</option>
-                ))}
-              </select>
-            </div>
-
-            {error && <p className={styles.errorMsg}>{error}</p>}
-
-            <button type="submit" className={styles.submitBtn} disabled={loading || !passwordsMatch}>
-              {loading ? 'Yaratilmoqda...' : 'Create account'}
-            </button>
-
-          </form>
-
-          <p className={styles.switchText}>
-            Already have an account?{' '}
-            <Link to="/login" className={styles.switchLink}>Sign in</Link>
-          </p>
+          )}
 
         </div>
       </div>

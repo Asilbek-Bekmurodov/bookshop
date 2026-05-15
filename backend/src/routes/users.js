@@ -3,6 +3,158 @@ import bcrypt from 'bcryptjs';
 import User from '../models/User.js';
 import { protect, requireAdmin } from '../middleware/auth.js';
 
+/**
+ * @swagger
+ * tags:
+ *   name: Users
+ *   description: Foydalanuvchilarni boshqarish (faqat admin)
+ */
+
+/**
+ * @swagger
+ * /api/users:
+ *   get:
+ *     summary: Barcha foydalanuvchilar ro'yxati
+ *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Foydalanuvchilar ro'yxati
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/User'
+ *       401:
+ *         description: Token yo'q
+ *       403:
+ *         description: Admin emas
+ */
+
+/**
+ * @swagger
+ * /api/users/{id}:
+ *   get:
+ *     summary: Bitta foydalanuvchi
+ *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Foydalanuvchi ma'lumoti
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/User'
+ *       404:
+ *         description: Topilmadi
+ */
+
+/**
+ * @swagger
+ * /api/users:
+ *   post:
+ *     summary: Yangi foydalanuvchi yaratish
+ *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [name, email, password]
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 example: Ali Karimov
+ *               email:
+ *                 type: string
+ *                 example: ali@example.com
+ *               password:
+ *                 type: string
+ *                 example: parol123
+ *               role:
+ *                 type: string
+ *                 enum: [user, admin]
+ *                 example: user
+ *     responses:
+ *       201:
+ *         description: Yaratildi
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/User'
+ *       400:
+ *         description: Noto'g'ri ma'lumot yoki email band
+ */
+
+/**
+ * @swagger
+ * /api/users/{id}:
+ *   patch:
+ *     summary: Foydalanuvchini tahrirlash
+ *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *               role:
+ *                 type: string
+ *                 enum: [user, admin]
+ *               password:
+ *                 type: string
+ *                 description: Bo'sh qoldirilsa o'zgarmaydi
+ *     responses:
+ *       200:
+ *         description: Yangilandi
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/User'
+ *       404:
+ *         description: Topilmadi
+ *   delete:
+ *     summary: Foydalanuvchini o'chirish
+ *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: O'chirildi
+ *       404:
+ *         description: Topilmadi
+ */
+
 const router = Router();
 router.use(protect, requireAdmin);
 

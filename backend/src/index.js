@@ -13,19 +13,8 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-const allowedOrigins = (process.env.CLIENT_URL || 'http://localhost:5173')
-  .split(',')
-  .map((o) => o.trim());
-
 app.use(cors({
-  origin: (origin, cb) => {
-    // dev da localhost:* har qanday portga ruxsat
-    if (!origin || allowedOrigins.includes(origin) || /^http:\/\/localhost:\d+$/.test(origin)) {
-      cb(null, true);
-    } else {
-      cb(new Error(`CORS: ${origin} ruxsatsiz`));
-    }
-  },
+  origin: true,
   credentials: true,
 }));
 app.use(express.json());

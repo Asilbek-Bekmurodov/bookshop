@@ -1,4 +1,7 @@
+import { useEffect } from 'react'
 import { Routes, Route } from 'react-router-dom'
+import { useDispatch } from 'react-redux'
+import { refreshAuth } from './store/authSlice'
 import MainLayout from './layouts/MainLayout'
 import HomePage from './pages/HomePage'
 import DashboardPage from './pages/DashboardPage'
@@ -12,6 +15,12 @@ import AdminDashboard from './pages/admin/AdminDashboard'
 import PrivateRoute from './components/PrivateRoute'
 
 function App() {
+  const dispatch = useDispatch()
+
+  useEffect(() => {
+    dispatch(refreshAuth())
+  }, [dispatch])
+
   return (
     <Routes>
       <Route element={<MainLayout />}>

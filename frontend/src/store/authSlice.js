@@ -25,9 +25,18 @@ export const logoutUser = createAsyncThunk('auth/logout', async () => {
   await axios.post(`${BASE}/auth/logout`, {}, { withCredentials: true }).catch(() => {});
 });
 
+export const refreshAuth = createAsyncThunk('auth/refresh', async (_, { rejectWithValue }) => {
+  try {
+    const { data } = await axios.post(`${BASE}/auth/refresh`, {}, { withCredentials: true });
+    return data;
+  } catch (err) {
+    return rejectWithValue(null);
+  }
+});
+
 const authSlice = createSlice({
   name: 'auth',
-  initialState: { user: null, accessToken: null, loading: false, error: null },
+  initialState: { user: null, accessToken: null, loading: false, error: null, initialized: false },
   reducers: {
     setTokens(state, { payload }) {
       state.accessToken = payload.accessToken;
@@ -61,6 +70,14 @@ const authSlice = createSlice({
       .addCase(logoutUser.fulfilled, (state) => {
         state.user = null;
         state.accessToken = null;
+      })
+      .addCase(refreshAuth.fulfilled, (state, { payload }) => {
+        state.user = payload.user;
+        state.accessToken = payload.accessToken;
+        state.initialized = true;
+      })
+      .addCase(refreshAuth.rejected, (state) => {
+        state.initialized = true;
       });
   },
 });

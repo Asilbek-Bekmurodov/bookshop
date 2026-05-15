@@ -16,11 +16,13 @@ const signRefresh = (user) =>
     expiresIn: '7d',
   });
 
+const isProd = process.env.NODE_ENV === 'production';
+
 const setRefreshCookie = (res, token) => {
   res.cookie('refreshToken', token, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'strict',
+    secure: isProd,
+    sameSite: isProd ? 'none' : 'lax',
     maxAge: 7 * 24 * 60 * 60 * 1000,
   });
 };
@@ -249,7 +251,7 @@ router.post('/logout', async (req, res) => {
       }
     }
   } catch { /* ignore */ }
-  res.clearCookie('refreshToken');
+  res.clearCookie('refreshToken', { httpOnly: true, secure: isProd, sameSite: isProd ? 'none' : 'lax' });
   res.json({ message: 'Chiqildi' });
 });
 

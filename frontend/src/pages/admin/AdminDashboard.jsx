@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
+import api from '../../api/axios'
 import {
   BarChart, Bar, LineChart, Line,
   XAxis, YAxis, CartesianGrid, Tooltip,
@@ -92,17 +93,6 @@ const DollarIcon = () => (
 )
 
 /* ── Mock Data ─────────────────────────────────────────────── */
-const INIT_USERS = [
-  { id:1, name:'Alice Johnson',  email:'alice@gmail.com',  role:'Reader', status:'Active',   joined:'2024-01-15' },
-  { id:2, name:'Bob Smith',      email:'bob@gmail.com',    role:'Reader', status:'Active',   joined:'2024-02-20' },
-  { id:3, name:'Carol White',    email:'carol@gmail.com',  role:'Editor', status:'Inactive', joined:'2024-03-10' },
-  { id:4, name:'David Brown',    email:'david@gmail.com',  role:'Reader', status:'Active',   joined:'2024-04-05' },
-  { id:5, name:'Emma Davis',     email:'emma@gmail.com',   role:'Editor', status:'Active',   joined:'2024-05-12' },
-  { id:6, name:'Frank Wilson',   email:'frank@gmail.com',  role:'Reader', status:'Active',   joined:'2024-06-18' },
-  { id:7, name:'Grace Lee',      email:'grace@gmail.com',  role:'Reader', status:'Inactive', joined:'2024-07-22' },
-  { id:8, name:'Henry Moore',    email:'henry@gmail.com',  role:'Admin',  status:'Active',   joined:'2024-08-30' },
-]
-
 const INIT_BOOKS = [
   { id:1, title:'The Great Gatsby',       author:'F. Scott Fitzgerald', category:'Fiction',     price:'$12.99', rating:4.8, stock:45 },
   { id:2, title:'Sapiens',                author:'Yuval Noah Harari',   category:'History',     price:'$15.99', rating:4.9, stock:32 },
@@ -170,10 +160,10 @@ const AdminDashboard = () => {
   const dropdownRef = useRef(null)
 
   // Users state
-  const [users, setUsers] = useState(INIT_USERS)
+  const [users, setUsers] = useState([])
   const [userModal, setUserModal] = useState(null)
   const [editingUser, setEditingUser] = useState(null)
-  const [userForm, setUserForm] = useState({ name:'', email:'', role:'Reader', status:'Active' })
+  const [userForm, setUserForm] = useState({ name:'', email:'', role:'user', password:'' })
 
   // Books state
   const [books, setBooks] = useState(INIT_BOOKS)
@@ -197,29 +187,46 @@ const AdminDashboard = () => {
     return () => document.removeEventListener('mousedown', handleClick)
   }, [])
 
+  useEffect(() => {
+    api.get('/users').then(({ data }) => setUsers(data)).catch(() => {})
+  }, [])
+
   /* ── Users CRUD ── */
   const openAddUser = () => {
-    setUserForm({ name:'', email:'', role:'Reader', status:'Active' })
+    setUserForm({ name:'', email:'', role:'user', password:'' })
     setEditingUser(null)
     setUserModal('add')
   }
   const openEditUser = (u) => {
-    setUserForm({ name:u.name, email:u.email, role:u.role, status:u.status })
+    setUserForm({ name:u.name, email:u.email, role:u.role, password:'' })
     setEditingUser(u)
     setUserModal('edit')
   }
   const openDelUser = (u) => { setEditingUser(u); setUserModal('delete') }
-  const saveUser = () => {
-    if (userModal === 'add') {
-      setUsers(prev => [...prev, { id: Date.now(), ...userForm, joined: new Date().toISOString().split('T')[0] }])
-    } else {
-      setUsers(prev => prev.map(u => u.id === editingUser.id ? { ...u, ...userForm } : u))
+  const saveUser = async () => {
+    try {
+      if (userModal === 'add') {
+        const { data } = await api.post('/users', userForm)
+        setUsers(prev => [data, ...prev])
+      } else {
+        const payload = { name: userForm.name, email: userForm.email, role: userForm.role }
+        if (userForm.password) payload.password = userForm.password
+        const { data } = await api.patch(`/users/${editingUser._id}`, payload)
+        setUsers(prev => prev.map(u => u._id === editingUser._id ? data : u))
+      }
+      setUserModal(null)
+    } catch (e) {
+      alert(e.response?.data?.message || 'Xato yuz berdi')
     }
-    setUserModal(null)
   }
-  const delUser = () => {
-    setUsers(prev => prev.filter(u => u.id !== editingUser.id))
-    setUserModal(null)
+  const delUser = async () => {
+    try {
+      await api.delete(`/users/${editingUser._id}`)
+      setUsers(prev => prev.filter(u => u._id !== editingUser._id))
+      setUserModal(null)
+    } catch (e) {
+      alert(e.response?.data?.message || 'Xato yuz berdi')
+    }
   }
 
   /* ── Books CRUD ── */
@@ -410,17 +417,18 @@ const AdminDashboard = () => {
               <div className={styles.formField}>
                 <label>Role</label>
                 <select value={userForm.role} onChange={e => setUserForm(f => ({ ...f, role: e.target.value }))}>
-                  <option>Reader</option>
-                  <option>Editor</option>
-                  <option>Admin</option>
+                  <option value="user">User</option>
+                  <option value="admin">Admin</option>
                 </select>
               </div>
               <div className={styles.formField}>
-                <label>Status</label>
-                <select value={userForm.status} onChange={e => setUserForm(f => ({ ...f, status: e.target.value }))}>
-                  <option>Active</option>
-                  <option>Inactive</option>
-                </select>
+                <label>{userModal === 'add' ? 'Password' : 'New Password (optional)'}</label>
+                <input
+                  type="password"
+                  value={userForm.password}
+                  onChange={e => setUserForm(f => ({ ...f, password: e.target.value }))}
+                  placeholder={userModal === 'add' ? 'Password' : 'Leave blank to keep'}
+                />
               </div>
             </div>
             <div className={styles.modalActions}>
@@ -617,6 +625,9 @@ const OverviewSection = ({ users, books, cats }) => {
 /* ══════════════════════════════════════════════════════════════
    USERS SECTION
 ══════════════════════════════════════════════════════════════ */
+const roleBadgeClass = (role) => role === 'admin' ? styles.roleAdmin : styles.roleReader
+const roleLabel = (role) => role === 'admin' ? 'Admin' : 'User'
+
 const UsersSection = ({ users, onAdd, onEdit, onDelete }) => (
   <div className={styles.section}>
     <div className={styles.sectionHeader}>
@@ -637,14 +648,13 @@ const UsersSection = ({ users, onAdd, onEdit, onDelete }) => (
             <th>User</th>
             <th>Email</th>
             <th>Role</th>
-            <th>Status</th>
             <th>Joined</th>
             <th>Actions</th>
           </tr>
         </thead>
         <tbody>
           {users.map((u, i) => (
-            <tr key={u.id}>
+            <tr key={u._id}>
               <td className={styles.tdNum}>{i + 1}</td>
               <td>
                 <div className={styles.userCell}>
@@ -656,15 +666,9 @@ const UsersSection = ({ users, onAdd, onEdit, onDelete }) => (
               </td>
               <td className={styles.tdMuted}>{u.email}</td>
               <td>
-                <span className={`${styles.roleBadge} ${styles['role' + u.role]}`}>{u.role}</span>
+                <span className={`${styles.roleBadge} ${roleBadgeClass(u.role)}`}>{roleLabel(u.role)}</span>
               </td>
-              <td>
-                <span className={`${styles.statusBadge} ${u.status === 'Active' ? styles.statusActive : styles.statusInactive}`}>
-                  <span className={styles.statusDot} />
-                  {u.status}
-                </span>
-              </td>
-              <td className={styles.tdMuted}>{u.joined}</td>
+              <td className={styles.tdMuted}>{u.createdAt ? new Date(u.createdAt).toLocaleDateString() : '-'}</td>
               <td>
                 <div className={styles.actions}>
                   <button className={styles.editBtn} onClick={() => onEdit(u)} title="Edit user"><EditIcon /></button>

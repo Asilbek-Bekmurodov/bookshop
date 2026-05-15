@@ -6,6 +6,7 @@ import swaggerUi from 'swagger-ui-express';
 import connectDB from './config/db.js';
 import seedAdmin from './config/seedAdmin.js';
 import authRouter from './routes/auth.js';
+import usersRouter from './routes/users.js';
 import swaggerSpec from './config/swagger.js';
 
 dotenv.config();
@@ -26,6 +27,7 @@ app.use(express.json());
 app.use(cookieParser());
 
 app.use('/api/auth', authRouter);
+app.use('/api/users', usersRouter);
 app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.get('/api/docs.json', (req, res) => res.json(swaggerSpec));
 

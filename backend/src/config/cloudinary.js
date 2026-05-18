@@ -10,11 +10,11 @@ cloudinary.config({
 
 const pdfStorage = new CloudinaryStorage({
   cloudinary,
-  params: {
+  params: async (req, file) => ({
     folder: 'bookshop/pdfs',
     resource_type: 'raw',
     allowed_formats: ['pdf'],
-  },
+  }),
 });
 
 export const uploadPdf = multer({ storage: pdfStorage });

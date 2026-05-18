@@ -77,20 +77,10 @@ const NewArrivals = () => {
               <h4 className={styles.bookTitle}>{book.title}</h4>
               <p className={styles.bookAuthor}>{book.author?.name || book.author || ''}</p>
               <StarRating rating={book.rating} />
-              <div className={styles.priceRow}>
-                {book.isFree ? (
-                  <span className={styles.price} style={{ color: '#4a8f48' }}>Free</span>
-                ) : (
-                  <>
-                    <span className={styles.price}>${book.price}</span>
-                    {book.originalPrice && (
-                      <span className={styles.originalPrice}>${book.originalPrice}</span>
-                    )}
-                  </>
-                )}
-              </div>
-              {!book.isFree && (
-                <button className={styles.addToCart}>Add to Cart</button>
+              {book.pdfUrl ? (
+                <span className={styles.readBadge}>O'qish mumkin</span>
+              ) : (
+                <span className={styles.comingSoon}>Tez kunda</span>
               )}
             </div>
           </Link>

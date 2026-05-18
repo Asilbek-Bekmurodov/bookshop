@@ -279,6 +279,18 @@
   background: #fdf7f2;
 }
 
+.comingSoon {
+  display: inline-block;
+  padding: 12px 28px;
+  border-radius: 50px;
+  background: rgba(200, 184, 154, 0.12);
+  color: #c8b89a;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  border: 1.5px dashed #c8b89a;
+}
+
 .cartBtn {
   width: 100%;
   background: transparent;

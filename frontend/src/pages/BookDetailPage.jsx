@@ -70,10 +70,6 @@ const BookDetailPage = () => {
   if (loading) return <div style={{ padding: '4rem', textAlign: 'center', color: '#c8b89a' }}>Yuklanmoqda...</div>
   if (!book) return <div style={{ padding: '4rem', textAlign: 'center', color: '#c8b89a' }}>Kitob topilmadi</div>
 
-  const discountPct = book.originalPrice
-    ? Math.round((1 - book.price / book.originalPrice) * 100)
-    : null
-
   return (
     <div className={styles.page}>
       {/* ── Breadcrumb ── */}
@@ -154,62 +150,32 @@ const BookDetailPage = () => {
 
           <hr className={styles.divider} />
 
-          <div className={styles.priceBlock}>
-            {book.isFree ? (
-              <span className={styles.price} style={{ color: '#4a8f48' }}>Free</span>
-            ) : (
-              <>
-                <span className={styles.price}>${book.price}</span>
-                {book.originalPrice && (
-                  <>
-                    <span className={styles.originalPrice}>${book.originalPrice}</span>
-                    <span className={styles.saveBadge}>Save {discountPct}%</span>
-                  </>
-                )}
-              </>
-            )}
-          </div>
-
           <div className={styles.actionRow}>
-            {book.isFree && book.pdfUrl && (
+            {book.pdfUrl ? (
               <button
                 className={styles.readBtn}
                 onClick={() => navigate(`/books/${book._id}/read`)}
               >
-                <svg
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.8"
-                  className={styles.btnIcon}
-                >
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className={styles.btnIcon}>
                   <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
                   <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
                 </svg>
-                Read Book
+                Kitobni o'qish
               </button>
+            ) : (
+              <span className={styles.comingSoon}>Tez kunda</span>
             )}
 
             <button
               className={`${styles.wishlistBtn} ${isWishlisted ? styles.wishlisted : ''}`}
               onClick={() => setIsWishlisted(!isWishlisted)}
             >
-              <svg
-                viewBox="0 0 24 24"
-                fill={isWishlisted ? 'currentColor' : 'none'}
-                stroke="currentColor"
-                strokeWidth="1.8"
-                className={styles.btnIcon}
-              >
+              <svg viewBox="0 0 24 24" fill={isWishlisted ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="1.8" className={styles.btnIcon}>
                 <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
               </svg>
-              {isWishlisted ? 'Wishlisted' : 'Wishlist'}
+              {isWishlisted ? 'Saralangan' : 'Saralagichga'}
             </button>
           </div>
-
-          {!book.isFree && (
-            <button className={styles.cartBtn}>Add to Cart — ${book.price}</button>
-          )}
         </div>
       </section>
 

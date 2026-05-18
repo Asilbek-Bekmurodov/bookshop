@@ -300,30 +300,27 @@
   text-decoration: line-through;
 }
 
-/* ── Add to Cart Button ── */
-.addToCart {
+.readBadge {
   margin-top: 6px;
-  width: 100%;
-  background-color: #7cb97a;
-  color: #fff;
-  border: none;
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 600;
+  color: #4a8f48;
+  background: rgba(74, 143, 72, 0.1);
   border-radius: 50px;
-  padding: 10px 0;
-  font-size: 13px;
+  padding: 4px 12px;
+}
+
+.comingSoon {
+  margin-top: 6px;
+  display: inline-block;
+  font-size: 12px;
   font-weight: 500;
-  cursor: pointer;
-  transition: background-color 0.2s ease, transform 0.15s ease;
-  opacity: 0;
-  transform: translateY(6px);
-}
-
-.bookCard:hover .addToCart {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-.addToCart:hover {
-  background-color: #6aa868;
+  color: #c8b89a;
+  background: rgba(200, 184, 154, 0.1);
+  border-radius: 50px;
+  padding: 4px 12px;
+  border: 1px dashed #c8b89a;
 }
 
 /* ── Responsive ── */

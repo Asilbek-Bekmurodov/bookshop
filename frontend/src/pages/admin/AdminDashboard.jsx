@@ -158,7 +158,7 @@ const AdminDashboard = () => {
   const [books, setBooks] = useState([])
   const [bookModal, setBookModal] = useState(null)
   const [editingBook, setEditingBook] = useState(null)
-  const [bookForm, setBookForm] = useState({ title:'', category:'Fiction', price:'', originalPrice:'', rating:'', stock:'', description:'', coverColor:'green', badge:'', genre:'', isFree:false, pageCount:'', publishedYear:'' })
+  const [bookForm, setBookForm] = useState({ title:'', category:'Fiction', rating:'', description:'', coverColor:'green', badge:'', genre:'', pageCount:'', publishedYear:'' })
   const [authorSearch, setAuthorSearch] = useState('')
   const [authorSuggestions, setAuthorSuggestions] = useState([])
   const [selectedAuthorId, setSelectedAuthorId] = useState(null)
@@ -287,7 +287,7 @@ const AdminDashboard = () => {
 
   /* ── Books CRUD ── */
   const openAddBook = () => {
-    setBookForm({ title:'', category:'Fiction', price:'', originalPrice:'', rating:'', stock:'', description:'', coverColor:'green', badge:'', genre:'', isFree:false, pageCount:'', publishedYear:'' })
+    setBookForm({ title:'', category:'Fiction', rating:'', description:'', coverColor:'green', badge:'', genre:'', pageCount:'', publishedYear:'' })
     setAuthorSearch('')
     setSelectedAuthorId(null)
     setAuthorSuggestions([])
@@ -299,15 +299,11 @@ const AdminDashboard = () => {
     setBookForm({
       title: b.title,
       category: b.category || 'Fiction',
-      price: String(b.price || ''),
-      originalPrice: b.originalPrice ? String(b.originalPrice) : '',
       rating: String(b.rating || ''),
-      stock: String(b.stock || ''),
       description: b.description || '',
       coverColor: b.coverColor || 'green',
       badge: b.badge || '',
       genre: b.genre || '',
-      isFree: b.isFree || false,
       pageCount: b.pageCount ? String(b.pageCount) : '',
       publishedYear: b.publishedYear ? String(b.publishedYear) : '',
     })
@@ -324,15 +320,11 @@ const AdminDashboard = () => {
       const payload = {
         title: bookForm.title,
         category: bookForm.category,
-        price: parseFloat(bookForm.price) || 0,
-        originalPrice: bookForm.originalPrice ? parseFloat(bookForm.originalPrice) : null,
         rating: parseFloat(bookForm.rating) || 0,
-        stock: parseInt(bookForm.stock) || 0,
         description: bookForm.description,
         coverColor: bookForm.coverColor,
         badge: bookForm.badge,
         genre: bookForm.genre,
-        isFree: bookForm.isFree,
         pageCount: bookForm.pageCount ? parseInt(bookForm.pageCount) : null,
         publishedYear: bookForm.publishedYear ? parseInt(bookForm.publishedYear) : null,
       }
@@ -675,20 +667,8 @@ const AdminDashboard = () => {
             </div>
             <div className={styles.formRow}>
               <div className={styles.formField}>
-                <label>Price</label>
-                <input value={bookForm.price} onChange={e => setBookForm(f => ({ ...f, price: e.target.value }))} placeholder="14.99" />
-              </div>
-              <div className={styles.formField}>
-                <label>Original Price</label>
-                <input value={bookForm.originalPrice} onChange={e => setBookForm(f => ({ ...f, originalPrice: e.target.value }))} placeholder="19.99" />
-              </div>
-              <div className={styles.formField}>
                 <label>Rating</label>
                 <input type="number" step="0.1" min="0" max="5" value={bookForm.rating} onChange={e => setBookForm(f => ({ ...f, rating: e.target.value }))} placeholder="4.5" />
-              </div>
-              <div className={styles.formField}>
-                <label>Stock</label>
-                <input type="number" min="0" value={bookForm.stock} onChange={e => setBookForm(f => ({ ...f, stock: e.target.value }))} placeholder="50" />
               </div>
             </div>
             <div className={styles.formRow}>
@@ -1003,9 +983,8 @@ const BooksSection = ({ books, onAdd, onEdit, onDelete }) => (
             <th>Title</th>
             <th>Author</th>
             <th>Category</th>
-            <th>Price</th>
             <th>Rating</th>
-            <th>Stock</th>
+            <th>PDF</th>
             <th>Actions</th>
           </tr>
         </thead>
@@ -1018,12 +997,13 @@ const BooksSection = ({ books, onAdd, onEdit, onDelete }) => (
               <td>
                 <span className={styles.catBadge}>{b.category}</span>
               </td>
-              <td className={styles.tdGold}>{b.price}</td>
               <td>
                 <span className={styles.ratingCell}>⭐ {b.rating}</span>
               </td>
               <td>
-                <span className={Number(b.stock) < 30 ? styles.stockLow : styles.stockOk}>{b.stock}</span>
+                <span className={b.pdfUrl ? styles.stockOk : styles.stockLow}>
+                  {b.pdfUrl ? 'PDF bor' : 'Tez kunda'}
+                </span>
               </td>
               <td>
                 <div className={styles.actions}>

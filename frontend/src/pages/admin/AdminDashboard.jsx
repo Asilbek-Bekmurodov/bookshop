@@ -93,17 +93,6 @@ const DollarIcon = () => (
 )
 
 /* ── Mock Data ─────────────────────────────────────────────── */
-const INIT_BOOKS = [
-  { id:1, title:'The Great Gatsby',       author:'F. Scott Fitzgerald', category:'Fiction',     price:'$12.99', rating:4.8, stock:45 },
-  { id:2, title:'Sapiens',                author:'Yuval Noah Harari',   category:'History',     price:'$15.99', rating:4.9, stock:32 },
-  { id:3, title:'Atomic Habits',          author:'James Clear',          category:'Self-Help',   price:'$14.99', rating:4.9, stock:78 },
-  { id:4, title:'1984',                   author:'George Orwell',        category:'Fiction',     price:'$10.99', rating:4.7, stock:56 },
-  { id:5, title:'Thinking Fast and Slow', author:'Daniel Kahneman',     category:'Psychology',  price:'$16.99', rating:4.6, stock:23 },
-  { id:6, title:'The Alchemist',          author:'Paulo Coelho',         category:'Fiction',     price:'$11.99', rating:4.8, stock:67 },
-  { id:7, title:'Educated',              author:'Tara Westover',        category:'Biography',   price:'$13.99', rating:4.7, stock:41 },
-  { id:8, title:'Dune',                   author:'Frank Herbert',        category:'Sci-Fi',      price:'$17.99', rating:4.9, stock:29 },
-]
-
 const INIT_CATS = [
   { id:1, name:'Fiction',    description:'Imaginative narratives and storytelling', books:45, color:'#2d4a3e' },
   { id:2, name:'History',    description:'Historical events and biographies',       books:28, color:'#4a2d2d' },
@@ -166,10 +155,14 @@ const AdminDashboard = () => {
   const [userForm, setUserForm] = useState({ name:'', email:'', role:'user', password:'' })
 
   // Books state
-  const [books, setBooks] = useState(INIT_BOOKS)
+  const [books, setBooks] = useState([])
   const [bookModal, setBookModal] = useState(null)
   const [editingBook, setEditingBook] = useState(null)
-  const [bookForm, setBookForm] = useState({ title:'', author:'', category:'Fiction', price:'', rating:'', stock:'' })
+  const [bookForm, setBookForm] = useState({ title:'', category:'Fiction', price:'', originalPrice:'', rating:'', stock:'', description:'', coverColor:'green', badge:'', genre:'', isFree:false, pageCount:'', publishedYear:'' })
+  const [authorSearch, setAuthorSearch] = useState('')
+  const [authorSuggestions, setAuthorSuggestions] = useState([])
+  const [selectedAuthorId, setSelectedAuthorId] = useState(null)
+  const [pdfFile, setPdfFile] = useState(null)
 
   // Categories state
   const [cats, setCats] = useState(INIT_CATS)
@@ -200,6 +193,21 @@ const AdminDashboard = () => {
   useEffect(() => {
     api.get('/authors').then(({ data }) => setAuthors(data)).catch(() => {})
   }, [])
+
+  useEffect(() => {
+    api.get('/books').then(({ data }) => setBooks(data)).catch(() => {})
+  }, [])
+
+  useEffect(() => {
+    if (authorSearch.length < 2) { setAuthorSuggestions([]); return }
+    const t = setTimeout(async () => {
+      try {
+        const { data } = await api.get(`/authors/search?q=${encodeURIComponent(authorSearch)}`)
+        setAuthorSuggestions(data)
+      } catch { setAuthorSuggestions([]) }
+    }, 300)
+    return () => clearTimeout(t)
+  }, [authorSearch])
 
   /* ── Users CRUD ── */
   const openAddUser = () => {
@@ -279,27 +287,95 @@ const AdminDashboard = () => {
 
   /* ── Books CRUD ── */
   const openAddBook = () => {
-    setBookForm({ title:'', author:'', category:'Fiction', price:'', rating:'', stock:'' })
+    setBookForm({ title:'', category:'Fiction', price:'', originalPrice:'', rating:'', stock:'', description:'', coverColor:'green', badge:'', genre:'', isFree:false, pageCount:'', publishedYear:'' })
+    setAuthorSearch('')
+    setSelectedAuthorId(null)
+    setAuthorSuggestions([])
+    setPdfFile(null)
     setEditingBook(null)
     setBookModal('add')
   }
   const openEditBook = (b) => {
-    setBookForm({ title:b.title, author:b.author, category:b.category, price:b.price, rating:String(b.rating), stock:String(b.stock) })
+    setBookForm({
+      title: b.title,
+      category: b.category || 'Fiction',
+      price: String(b.price || ''),
+      originalPrice: b.originalPrice ? String(b.originalPrice) : '',
+      rating: String(b.rating || ''),
+      stock: String(b.stock || ''),
+      description: b.description || '',
+      coverColor: b.coverColor || 'green',
+      badge: b.badge || '',
+      genre: b.genre || '',
+      isFree: b.isFree || false,
+      pageCount: b.pageCount ? String(b.pageCount) : '',
+      publishedYear: b.publishedYear ? String(b.publishedYear) : '',
+    })
+    setAuthorSearch(b.author?.name || '')
+    setSelectedAuthorId(b.author?._id || null)
+    setAuthorSuggestions([])
+    setPdfFile(null)
     setEditingBook(b)
     setBookModal('edit')
   }
   const openDelBook = (b) => { setEditingBook(b); setBookModal('delete') }
-  const saveBook = () => {
-    if (bookModal === 'add') {
-      setBooks(prev => [...prev, { id: Date.now(), ...bookForm, rating: parseFloat(bookForm.rating) || 4.5, stock: parseInt(bookForm.stock) || 0 }])
-    } else {
-      setBooks(prev => prev.map(b => b.id === editingBook.id ? { ...b, ...bookForm, rating: parseFloat(bookForm.rating) || b.rating, stock: parseInt(bookForm.stock) || b.stock } : b))
+  const saveBook = async () => {
+    try {
+      const payload = {
+        title: bookForm.title,
+        category: bookForm.category,
+        price: parseFloat(bookForm.price) || 0,
+        originalPrice: bookForm.originalPrice ? parseFloat(bookForm.originalPrice) : null,
+        rating: parseFloat(bookForm.rating) || 0,
+        stock: parseInt(bookForm.stock) || 0,
+        description: bookForm.description,
+        coverColor: bookForm.coverColor,
+        badge: bookForm.badge,
+        genre: bookForm.genre,
+        isFree: bookForm.isFree,
+        pageCount: bookForm.pageCount ? parseInt(bookForm.pageCount) : null,
+        publishedYear: bookForm.publishedYear ? parseInt(bookForm.publishedYear) : null,
+      }
+
+      if (selectedAuthorId) {
+        payload.authorId = selectedAuthorId
+      } else if (authorSearch.trim()) {
+        payload.authorName = authorSearch.trim()
+      }
+
+      let savedBook
+      if (bookModal === 'add') {
+        const { data } = await api.post('/books', payload)
+        savedBook = data
+        setBooks(prev => [savedBook, ...prev])
+      } else {
+        const { data } = await api.put(`/books/${editingBook._id}`, payload)
+        savedBook = data
+        setBooks(prev => prev.map(b => b._id === editingBook._id ? savedBook : b))
+      }
+
+      if (pdfFile && savedBook._id) {
+        const formData = new FormData()
+        formData.append('pdf', pdfFile)
+        const { data: withPdf } = await api.post(`/books/${savedBook._id}/upload-pdf`, formData, {
+          headers: { 'Content-Type': 'multipart/form-data' }
+        })
+        setBooks(prev => prev.map(b => b._id === withPdf._id ? withPdf : b))
+      }
+
+      setBookModal(null)
+    } catch (e) {
+      alert(e.response?.data?.message || 'Xato yuz berdi')
     }
-    setBookModal(null)
   }
-  const delBook = () => {
-    setBooks(prev => prev.filter(b => b.id !== editingBook.id))
-    setBookModal(null)
+  const delBook = async () => {
+    try {
+      await api.delete(`/books/${editingBook._id}`)
+      setBooks(prev => prev.filter(b => b._id !== editingBook._id))
+      setBookModal(null)
+    } catch (e) {
+      alert(e.response?.data?.message || 'Xato yuz berdi')
+    }
   }
 
   /* ── Categories CRUD ── */
@@ -555,9 +631,39 @@ const AdminDashboard = () => {
               <label>Title</label>
               <input value={bookForm.title} onChange={e => setBookForm(f => ({ ...f, title: e.target.value }))} placeholder="Book title" />
             </div>
-            <div className={styles.formField}>
-              <label>Author</label>
-              <input value={bookForm.author} onChange={e => setBookForm(f => ({ ...f, author: e.target.value }))} placeholder="Author name" />
+            {/* Author autocomplete */}
+            <div className={styles.formField} style={{ position: 'relative' }}>
+              <label>Author *</label>
+              <input
+                value={authorSearch}
+                onChange={e => { setAuthorSearch(e.target.value); setSelectedAuthorId(null) }}
+                placeholder="Author nomini yozing..."
+                autoComplete="off"
+              />
+              {authorSuggestions.length > 0 && (
+                <div style={{
+                  position: 'absolute', top: '100%', left: 0, right: 0, zIndex: 100,
+                  background: '#1e1e1e', border: '1px solid #3a3028', borderRadius: 6,
+                  maxHeight: 200, overflowY: 'auto'
+                }}>
+                  {authorSuggestions.map(a => (
+                    <div
+                      key={a._id}
+                      onClick={() => { setAuthorSearch(a.name); setSelectedAuthorId(a._id); setAuthorSuggestions([]) }}
+                      style={{ padding: '8px 12px', cursor: 'pointer', borderBottom: '1px solid #2a2a2a' }}
+                      onMouseEnter={e => e.currentTarget.style.background = '#2a2a2a'}
+                      onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+                    >
+                      {a.name}
+                    </div>
+                  ))}
+                </div>
+              )}
+              {selectedAuthorId && (
+                <span style={{ fontSize: 11, color: '#4a8f48', marginTop: 2, display: 'block' }}>
+                  ✓ Bazadan tanlandi
+                </span>
+              )}
             </div>
             <div className={styles.formField}>
               <label>Category</label>
@@ -570,7 +676,11 @@ const AdminDashboard = () => {
             <div className={styles.formRow}>
               <div className={styles.formField}>
                 <label>Price</label>
-                <input value={bookForm.price} onChange={e => setBookForm(f => ({ ...f, price: e.target.value }))} placeholder="$14.99" />
+                <input value={bookForm.price} onChange={e => setBookForm(f => ({ ...f, price: e.target.value }))} placeholder="14.99" />
+              </div>
+              <div className={styles.formField}>
+                <label>Original Price</label>
+                <input value={bookForm.originalPrice} onChange={e => setBookForm(f => ({ ...f, originalPrice: e.target.value }))} placeholder="19.99" />
               </div>
               <div className={styles.formField}>
                 <label>Rating</label>
@@ -580,6 +690,49 @@ const AdminDashboard = () => {
                 <label>Stock</label>
                 <input type="number" min="0" value={bookForm.stock} onChange={e => setBookForm(f => ({ ...f, stock: e.target.value }))} placeholder="50" />
               </div>
+            </div>
+            <div className={styles.formRow}>
+              <div className={styles.formField}>
+                <label>Genre</label>
+                <input value={bookForm.genre} onChange={e => setBookForm(f => ({ ...f, genre: e.target.value }))} placeholder="Drama" />
+              </div>
+              <div className={styles.formField}>
+                <label>Badge</label>
+                <input value={bookForm.badge} onChange={e => setBookForm(f => ({ ...f, badge: e.target.value }))} placeholder="Bestseller" />
+              </div>
+              <div className={styles.formField}>
+                <label>Cover Color</label>
+                <input value={bookForm.coverColor} onChange={e => setBookForm(f => ({ ...f, coverColor: e.target.value }))} placeholder="green" />
+              </div>
+            </div>
+            <div className={styles.formRow}>
+              <div className={styles.formField}>
+                <label>Page Count</label>
+                <input type="number" min="0" value={bookForm.pageCount} onChange={e => setBookForm(f => ({ ...f, pageCount: e.target.value }))} placeholder="320" />
+              </div>
+              <div className={styles.formField}>
+                <label>Published Year</label>
+                <input type="number" min="0" value={bookForm.publishedYear} onChange={e => setBookForm(f => ({ ...f, publishedYear: e.target.value }))} placeholder="2020" />
+              </div>
+            </div>
+            <div className={styles.formField}>
+              <label>Description</label>
+              <textarea value={bookForm.description} onChange={e => setBookForm(f => ({ ...f, description: e.target.value }))} placeholder="Short description..." rows={3} style={{ width: '100%', resize: 'vertical' }} />
+            </div>
+            {/* PDF upload */}
+            <div className={styles.formField}>
+              <label>PDF fayl (ixtiyoriy)</label>
+              <input
+                type="file"
+                accept=".pdf"
+                onChange={e => setPdfFile(e.target.files?.[0] || null)}
+                style={{ color: '#c8b89a' }}
+              />
+              {editingBook?.pdfUrl && !pdfFile && (
+                <span style={{ fontSize: 11, color: '#4a8f48', marginTop: 2, display: 'block' }}>
+                  ✓ PDF mavjud — yangi fayl tanlasangiz almashadi
+                </span>
+              )}
             </div>
             <div className={styles.modalActions}>
               <button className={styles.cancelBtn} onClick={() => setBookModal(null)}>Cancel</button>
@@ -850,10 +1003,10 @@ const BooksSection = ({ books, onAdd, onEdit, onDelete }) => (
         </thead>
         <tbody>
           {books.map((b, i) => (
-            <tr key={b.id}>
+            <tr key={b._id || b.id}>
               <td className={styles.tdNum}>{i + 1}</td>
               <td className={styles.tdBold}>{b.title}</td>
-              <td className={styles.tdMuted}>{b.author}</td>
+              <td className={styles.tdMuted}>{b.author?.name || b.author || '—'}</td>
               <td>
                 <span className={styles.catBadge}>{b.category}</span>
               </td>

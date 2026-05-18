@@ -6,7 +6,35 @@ import { uploadPdf, uploadToSupabase } from '../config/cloudinary.js';
 
 const router = Router();
 
-// GET /api/books - barcha kitoblar (public), author populated
+/**
+ * @swagger
+ * tags:
+ *   name: Books
+ *   description: Kitoblar CRUD va PDF yuklash
+ */
+
+/**
+ * @swagger
+ * /api/books:
+ *   get:
+ *     summary: Barcha kitoblar ro'yxati
+ *     tags: [Books]
+ *     parameters:
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *         description: Nechta kitob qaytarilsin (0 = hammasi)
+ *     responses:
+ *       200:
+ *         description: Kitoblar massivi
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Book'
+ */
 router.get('/', async (req, res) => {
   try {
     const limit = parseInt(req.query.limit) || 0;
@@ -19,7 +47,55 @@ router.get('/', async (req, res) => {
   }
 });
 
-// GET /api/books/:id - bitta kitob (public)
+/**
+ * @swagger
+ * /api/books:
+ *   post:
+ *     summary: Yangi kitob yaratish (admin)
+ *     tags: [Books]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/BookInput'
+ *     responses:
+ *       201:
+ *         description: Yaratilgan kitob
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Book'
+ *       400:
+ *         description: Majburiy maydon yo'q
+ *       401:
+ *         description: Avtorizatsiya talab qilinadi
+ */
+
+/**
+ * @swagger
+ * /api/books/{id}:
+ *   get:
+ *     summary: Bitta kitob
+ *     tags: [Books]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Kitob ma'lumotlari
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Book'
+ *       404:
+ *         description: Kitob topilmadi
+ */
 router.get('/:id', async (req, res) => {
   try {
     const book = await Book.findById(req.params.id).populate('author', 'name nationality photo bio');
@@ -30,7 +106,6 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-// POST /api/books - yangi kitob yaratish (admin)
 router.post('/', protect, requireAdmin, async (req, res) => {
   try {
     const {
@@ -66,7 +141,51 @@ router.post('/', protect, requireAdmin, async (req, res) => {
   }
 });
 
-// PUT /api/books/:id - tahrirlash (admin)
+/**
+ * @swagger
+ * /api/books/{id}:
+ *   put:
+ *     summary: Kitobni tahrirlash (admin)
+ *     tags: [Books]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/BookInput'
+ *     responses:
+ *       200:
+ *         description: Yangilangan kitob
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Book'
+ *       404:
+ *         description: Kitob topilmadi
+ *   delete:
+ *     summary: Kitobni o'chirish (admin)
+ *     tags: [Books]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: O'chirildi
+ *       404:
+ *         description: Kitob topilmadi
+ */
 router.put('/:id', protect, requireAdmin, async (req, res) => {
   try {
     const {
@@ -107,7 +226,6 @@ router.put('/:id', protect, requireAdmin, async (req, res) => {
   }
 });
 
-// DELETE /api/books/:id (admin)
 router.delete('/:id', protect, requireAdmin, async (req, res) => {
   try {
     const book = await Book.findByIdAndDelete(req.params.id);
@@ -118,7 +236,43 @@ router.delete('/:id', protect, requireAdmin, async (req, res) => {
   }
 });
 
-// POST /api/books/:id/upload-pdf - PDF yuklash Cloudinary'ga (admin)
+/**
+ * @swagger
+ * /api/books/{id}/upload-pdf:
+ *   post:
+ *     summary: Kitobga PDF yuklash (admin)
+ *     tags: [Books]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               pdf:
+ *                 type: string
+ *                 format: binary
+ *                 description: PDF fayl (max 50MB)
+ *     responses:
+ *       200:
+ *         description: PDF yuklandi, kitob yangilandi
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Book'
+ *       400:
+ *         description: PDF fayl yuborilmadi
+ *       404:
+ *         description: Kitob topilmadi
+ */
 router.post('/:id/upload-pdf', protect, requireAdmin, uploadPdf.single('pdf'), async (req, res) => {
   try {
     if (!req.file) return res.status(400).json({ message: 'PDF fayl yuborilmadi' });

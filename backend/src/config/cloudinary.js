@@ -1,4 +1,5 @@
 import { v2 as cloudinary } from 'cloudinary';
+import { createClient } from '@supabase/supabase-js';
 import multer from 'multer';
 
 cloudinary.config({
@@ -6,6 +7,13 @@ cloudinary.config({
   api_key: process.env.CLOUDINARY_API_KEY,
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
+
+const supabase = createClient(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_SERVICE_KEY
+);
+
+const BUCKET = 'bookshop-pdfs';
 
 export const uploadPdf = multer({
   storage: multer.memoryStorage(),
@@ -16,14 +24,17 @@ export const uploadPdf = multer({
   },
 });
 
-export const uploadToCloudinary = (buffer) =>
-  new Promise((resolve, reject) => {
-    cloudinary.uploader
-      .upload_stream({ folder: 'bookshop/pdfs', resource_type: 'raw' }, (err, result) => {
-        if (err) reject(err);
-        else resolve(result);
-      })
-      .end(buffer);
-  });
+export const uploadToSupabase = async (buffer, originalName) => {
+  const filename = `${Date.now()}-${originalName.replace(/\s+/g, '_')}`;
+
+  const { error } = await supabase.storage
+    .from(BUCKET)
+    .upload(filename, buffer, { contentType: 'application/pdf', upsert: true });
+
+  if (error) throw error;
+
+  const { data } = supabase.storage.from(BUCKET).getPublicUrl(filename);
+  return data.publicUrl;
+};
 
 export default cloudinary;

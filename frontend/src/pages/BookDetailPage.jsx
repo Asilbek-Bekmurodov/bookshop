@@ -1,104 +1,7 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
+import api from '../api/axios'
 import styles from './BookDetailPage.module.css'
-
-const allBooks = [
-  {
-    id: 1,
-    title: 'The Art of Thinking Clearly',
-    author: 'Rolf Dobelli',
-    rating: 4.8,
-    reviews: 2341,
-    price: 24.99,
-    originalPrice: 34.99,
-    badge: 'Bestseller',
-    coverColor: 'green',
-    genre: 'Philosophy',
-    year: 2013,
-    pages: 384,
-    language: 'English',
-    publisher: 'HarperCollins',
-    isFree: false,
-    description:
-      'In The Art of Thinking Clearly, Rolf Dobelli catalogues 99 of the most common thinking errors—from anchoring to the sunk cost fallacy—that prevent us from making better decisions in our lives, businesses, and politics. Simple and straightforward, this indispensable guide helps us recognize and avoid the cognitive biases, irrational thinking, and logical fallacies that all too often lead us astray.',
-  },
-  {
-    id: 2,
-    title: 'Deep Work',
-    author: 'Cal Newport',
-    rating: 4.9,
-    reviews: 5234,
-    price: 0,
-    originalPrice: null,
-    badge: 'Free',
-    coverColor: 'purple',
-    genre: 'Productivity',
-    year: 2016,
-    pages: 296,
-    language: 'English',
-    publisher: 'Grand Central Publishing',
-    isFree: true,
-    description:
-      "One of the most valuable skills in our economy is becoming increasingly rare. If you master this skill, you'll achieve extraordinary results. Deep work is the ability to focus without distraction on a cognitively demanding task—a skill that allows you to quickly master complicated information and produce better results in less time.",
-  },
-  {
-    id: 3,
-    title: 'The Midnight Library',
-    author: 'Matt Haig',
-    rating: 4.7,
-    reviews: 8901,
-    price: 22.99,
-    originalPrice: 29.99,
-    badge: 'New',
-    coverColor: 'dark',
-    genre: 'Fiction',
-    year: 2020,
-    pages: 288,
-    language: 'English',
-    publisher: 'Viking',
-    isFree: false,
-    description:
-      'Between life and death there is a library, and within that library, the shelves go on forever. Every book provides a chance to try another life you could have lived. To see how things would be if you had made other choices. Would you have done anything different, if you had the chance to undo your regrets?',
-  },
-  {
-    id: 4,
-    title: 'Atomic Habits',
-    author: 'James Clear',
-    rating: 4.9,
-    reviews: 12500,
-    price: 27.99,
-    originalPrice: null,
-    badge: 'Trending',
-    coverColor: 'orange',
-    genre: 'Self-Help',
-    year: 2018,
-    pages: 320,
-    language: 'English',
-    publisher: 'Avery',
-    isFree: false,
-    description:
-      'Tiny changes, remarkable results. No matter your goals, Atomic Habits offers a proven framework for improving—every day. James Clear reveals practical strategies that will teach you exactly how to form good habits, break bad ones, and master the tiny behaviors that lead to remarkable results.',
-  },
-  {
-    id: 5,
-    title: 'Project Hail Mary',
-    author: 'Andy Weir',
-    rating: 4.8,
-    reviews: 6789,
-    price: 0,
-    originalPrice: 25.99,
-    badge: 'Free',
-    coverColor: 'teal',
-    genre: 'Sci-Fi',
-    year: 2021,
-    pages: 476,
-    language: 'English',
-    publisher: 'Ballantine Books',
-    isFree: true,
-    description:
-      'A lone astronaut must save the earth from disaster in this propulsive, gripping adventure from the author of The Martian. Ryland Grace is the sole survivor on a desperate, last-chance mission—and if he fails, humanity and the Earth itself will perish.',
-  },
-]
 
 const reviewsData = [
   {
@@ -154,9 +57,19 @@ const BookDetailPage = () => {
   const [userRating, setUserRating] = useState(0)
   const [hoveredStar, setHoveredStar] = useState(0)
   const [reviewText, setReviewText] = useState('')
+  const [book, setBook] = useState(null)
+  const [loading, setLoading] = useState(true)
 
-  const book = allBooks.find((b) => b.id === parseInt(id)) || allBooks[0]
-  const similarBooks = allBooks.filter((b) => b.id !== book.id).slice(0, 4)
+  useEffect(() => {
+    setLoading(true)
+    api.get(`/books/${id}`)
+      .then(({ data }) => { setBook(data); setLoading(false) })
+      .catch(() => { setLoading(false) })
+  }, [id])
+
+  if (loading) return <div style={{ padding: '4rem', textAlign: 'center', color: '#c8b89a' }}>Yuklanmoqda...</div>
+  if (!book) return <div style={{ padding: '4rem', textAlign: 'center', color: '#c8b89a' }}>Kitob topilmadi</div>
+
   const discountPct = book.originalPrice
     ? Math.round((1 - book.price / book.originalPrice) * 100)
     : null
@@ -188,7 +101,7 @@ const BookDetailPage = () => {
               <div className={styles.coverContent}>
                 <span className={styles.coverGenre}>{book.genre}</span>
                 <h3 className={styles.coverTitle}>{book.title}</h3>
-                <span className={styles.coverAuthor}>{book.author}</span>
+                <span className={styles.coverAuthor}>{book.author?.name || book.author}</span>
               </div>
               {book.badge && (
                 <span className={`${styles.badge} ${styles['badge' + book.badge]}`}>
@@ -224,7 +137,7 @@ const BookDetailPage = () => {
 
           <h1 className={styles.bookTitle}>{book.title}</h1>
           <p className={styles.bookAuthor}>
-            by <span className={styles.authorName}>{book.author}</span>
+            by <span className={styles.authorName}>{book.author?.name || book.author}</span>
           </p>
 
           <div className={styles.ratingRow}>
@@ -258,10 +171,10 @@ const BookDetailPage = () => {
           </div>
 
           <div className={styles.actionRow}>
-            {book.isFree && (
+            {book.isFree && book.pdfUrl && (
               <button
                 className={styles.readBtn}
-                onClick={() => navigate(`/books/${book.id}/read`)}
+                onClick={() => navigate(`/books/${book._id}/read`)}
               >
                 <svg
                   viewBox="0 0 24 24"
@@ -416,36 +329,7 @@ const BookDetailPage = () => {
           </div>
 
           <div className={styles.similarGrid}>
-            {similarBooks.map((b) => (
-              <Link to={`/books/${b.id}`} key={b.id} className={styles.similarCard}>
-                <div className={`${styles.similarCover} ${styles[b.coverColor]}`}>
-                  <div className={styles.spine} />
-                  <div className={styles.coverDecorCircle} />
-                  <div className={styles.coverDecorLine} />
-                  <div className={styles.coverContent}>
-                    <span className={styles.coverGenre}>{b.genre}</span>
-                    <h3 className={styles.coverTitle}>{b.title}</h3>
-                    <span className={styles.coverAuthor}>{b.author}</span>
-                  </div>
-                  {b.badge && (
-                    <span className={`${styles.badge} ${styles['badge' + b.badge]}`}>
-                      {b.badge}
-                    </span>
-                  )}
-                </div>
-                <div className={styles.similarInfo}>
-                  <h4 className={styles.similarTitle}>{b.title}</h4>
-                  <p className={styles.similarAuthor}>{b.author}</p>
-                  <div className={styles.similarBottom}>
-                    <div className={styles.miniRatingRow}>
-                      <StarRating rating={b.rating} size="sm" />
-                      <span className={styles.miniRating}>{b.rating}</span>
-                    </div>
-                    <span className={styles.similarPrice}>${b.price}</span>
-                  </div>
-                </div>
-              </Link>
-            ))}
+            {/* Similar books loaded from backend in a future enhancement */}
           </div>
         </div>
       </section>

@@ -1,71 +1,7 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import styles from './NewArrivals.module.css'
-
-const books = [
-  {
-    id: 1,
-    title: 'The Art of Thinking Clearly',
-    author: 'Rolf Dobelli',
-    rating: 4.8,
-    reviews: 2341,
-    price: 24.99,
-    originalPrice: 34.99,
-    badge: 'Bestseller',
-    coverColor: 'green',
-    genre: 'Philosophy',
-  },
-  {
-    id: 2,
-    title: 'Deep Work',
-    author: 'Cal Newport',
-    rating: 4.9,
-    reviews: 5234,
-    price: 0,
-    originalPrice: null,
-    badge: 'Free',
-    coverColor: 'purple',
-    genre: 'Productivity',
-    isFree: true,
-  },
-  {
-    id: 3,
-    title: 'The Midnight Library',
-    author: 'Matt Haig',
-    rating: 4.7,
-    reviews: 8901,
-    price: 22.99,
-    originalPrice: 29.99,
-    badge: 'New',
-    coverColor: 'dark',
-    genre: 'Fiction',
-  },
-  {
-    id: 4,
-    title: 'Atomic Habits',
-    author: 'James Clear',
-    rating: 4.9,
-    reviews: 12500,
-    price: 27.99,
-    originalPrice: null,
-    badge: 'Trending',
-    coverColor: 'orange',
-    genre: 'Self-Help',
-  },
-  {
-    id: 5,
-    title: 'Project Hail Mary',
-    author: 'Andy Weir',
-    rating: 4.8,
-    reviews: 6789,
-    price: 0,
-    originalPrice: 25.99,
-    badge: 'Free',
-    coverColor: 'teal',
-    genre: 'Sci-Fi',
-    isFree: true,
-  },
-]
+import api from '../../api/axios'
 
 const StarRating = ({ rating }) => (
   <div className={styles.stars}>
@@ -83,7 +19,12 @@ const StarRating = ({ rating }) => (
 )
 
 const NewArrivals = () => {
+  const [books, setBooks] = useState([])
   const [hoveredId, setHoveredId] = useState(null)
+
+  useEffect(() => {
+    api.get('/books?limit=6').then(({ data }) => setBooks(data)).catch(() => {})
+  }, [])
 
   return (
     <section className={styles.section}>
@@ -109,10 +50,10 @@ const NewArrivals = () => {
       <div className={styles.booksGrid}>
         {books.map((book) => (
           <Link
-            to={`/books/${book.id}`}
-            key={book.id}
-            className={`${styles.bookCard} ${hoveredId === book.id ? styles.bookCardHovered : ''}`}
-            onMouseEnter={() => setHoveredId(book.id)}
+            to={`/books/${book._id}`}
+            key={book._id}
+            className={`${styles.bookCard} ${hoveredId === book._id ? styles.bookCardHovered : ''}`}
+            onMouseEnter={() => setHoveredId(book._id)}
             onMouseLeave={() => setHoveredId(null)}
             style={{ textDecoration: 'none', color: 'inherit' }}
           >
@@ -123,7 +64,7 @@ const NewArrivals = () => {
               <div className={styles.coverContent}>
                 <span className={styles.coverGenre}>{book.genre}</span>
                 <h3 className={styles.coverTitle}>{book.title}</h3>
-                <span className={styles.coverAuthor}>{book.author}</span>
+                <span className={styles.coverAuthor}>{book.author?.name || book.author || ''}</span>
               </div>
               {book.badge && (
                 <span className={`${styles.badge} ${styles[`badge${book.badge}`]}`}>
@@ -134,7 +75,7 @@ const NewArrivals = () => {
 
             <div className={styles.bookInfo}>
               <h4 className={styles.bookTitle}>{book.title}</h4>
-              <p className={styles.bookAuthor}>{book.author}</p>
+              <p className={styles.bookAuthor}>{book.author?.name || book.author || ''}</p>
               <StarRating rating={book.rating} />
               <div className={styles.priceRow}>
                 {book.isFree ? (

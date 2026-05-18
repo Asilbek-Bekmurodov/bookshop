@@ -2,7 +2,7 @@ import { Router } from 'express';
 import Book from '../models/Book.js';
 import Author from '../models/Author.js';
 import { protect, requireAdmin } from '../middleware/auth.js';
-import { uploadPdf } from '../config/cloudinary.js';
+import { uploadPdf, uploadToCloudinary } from '../config/cloudinary.js';
 
 const router = Router();
 
@@ -122,9 +122,10 @@ router.delete('/:id', protect, requireAdmin, async (req, res) => {
 router.post('/:id/upload-pdf', protect, requireAdmin, uploadPdf.single('pdf'), async (req, res) => {
   try {
     if (!req.file) return res.status(400).json({ message: 'PDF fayl yuborilmadi' });
+    const result = await uploadToCloudinary(req.file.buffer);
     const book = await Book.findByIdAndUpdate(
       req.params.id,
-      { pdfUrl: req.file.path },
+      { pdfUrl: result.secure_url },
       { new: true }
     ).populate('author', 'name nationality photo');
     if (!book) return res.status(404).json({ message: 'Kitob topilmadi' });

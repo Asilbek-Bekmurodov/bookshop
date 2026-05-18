@@ -7,6 +7,8 @@ import connectDB from './config/db.js';
 import seedAdmin from './config/seedAdmin.js';
 import authRouter from './routes/auth.js';
 import usersRouter from './routes/users.js';
+import authorsRouter from './routes/authors.js';
+import booksRouter from './routes/books.js';
 import swaggerSpec from './config/swagger.js';
 
 dotenv.config();
@@ -28,6 +30,8 @@ app.use(cookieParser());
 
 app.use('/api/auth', authRouter);
 app.use('/api/users', usersRouter);
+app.use('/api/authors', authorsRouter);
+app.use('/api/books', booksRouter);
 app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.get('/api/docs.json', (req, res) => res.json(swaggerSpec));
 

@@ -156,6 +156,35 @@ import { protect, requireAdmin } from '../middleware/auth.js';
  */
 
 const router = Router();
+
+// GET /api/users/me - joriy foydalanuvchi profili
+router.get('/me', protect, async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id).select('-passwordHash -refreshTokens');
+    if (!user) return res.status(404).json({ message: 'Foydalanuvchi topilmadi' });
+    res.json(user);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// PATCH /api/users/me - joriy foydalanuvchi profilini yangilash
+router.patch('/me', protect, async (req, res) => {
+  try {
+    const { name, favAuthors, favGenres, age } = req.body;
+    const update = {};
+    if (name !== undefined) update.name = name;
+    if (favAuthors !== undefined) update.favAuthors = favAuthors;
+    if (favGenres !== undefined) update.favGenres = favGenres;
+    if (age !== undefined) update.age = age;
+    const user = await User.findByIdAndUpdate(req.user.id, update, { new: true })
+      .select('-passwordHash -refreshTokens');
+    res.json(user);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
 router.use(protect, requireAdmin);
 
 router.get('/', async (req, res) => {

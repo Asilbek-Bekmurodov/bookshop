@@ -1,5 +1,6 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
+import api from '../api/axios'
 import styles from './ProfilePage.module.css'
 
 /* ── Icons ─────────────────────────────────────────────────── */
@@ -120,13 +121,33 @@ const ProfilePage = () => {
   const [hobbyInput, setHobbyInput] = useState('')
 
   const [userData, setUserData] = useState({
-    firstName: 'Asilbek',
-    lastName:  'Bekmurodov',
-    email:     'user@gmail.com',
-    hobbies:   ['Reading', 'Writing', 'Traveling'],
+    firstName:   'Asilbek',
+    lastName:    'Bekmurodov',
+    email:       'user@gmail.com',
+    hobbies:     ['Reading', 'Writing', 'Traveling'],
+    favAuthors:  [],
   })
 
   const [draft, setDraft] = useState({ ...userData })
+
+  useEffect(() => {
+    api.get('/users/me')
+      .then(({ data }) => {
+        const parts = (data.name || '').split(' ')
+        const firstName = parts[0] || ''
+        const lastName = parts.slice(1).join(' ') || ''
+        const newData = {
+          firstName,
+          lastName,
+          email:      data.email || '',
+          hobbies:    data.favGenres || [],
+          favAuthors: data.favAuthors || [],
+        }
+        setUserData(newData)
+        setDraft(newData)
+      })
+      .catch(() => {})
+  }, [])
 
   const initials = `${userData.firstName[0]}${userData.lastName[0]}`.toUpperCase()
 
@@ -143,9 +164,19 @@ const ProfilePage = () => {
     setEditing(true)
   }
 
-  const saveEdit = () => {
-    setUserData({ ...draft })
-    setEditing(false)
+  const saveEdit = async () => {
+    try {
+      const name = `${draft.firstName} ${draft.lastName}`.trim()
+      await api.patch('/users/me', {
+        name,
+        favGenres:  draft.hobbies || [],
+        favAuthors: draft.favAuthors || [],
+      })
+      setUserData({ ...draft })
+      setEditing(false)
+    } catch (e) {
+      alert(e.response?.data?.message || 'Saqlashda xato yuz berdi')
+    }
   }
 
   const cancelEdit = () => {

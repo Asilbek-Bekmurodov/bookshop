@@ -867,7 +867,8 @@
 }
 
 .formField input,
-.formField select {
+.formField select,
+.formField textarea {
   padding: 11px 14px;
   background: #f5f0e8;
   border: 1.5px solid transparent;
@@ -884,7 +885,8 @@
 .formField input::placeholder { color: #b0a070; }
 
 .formField input:focus,
-.formField select:focus {
+.formField select:focus,
+.formField textarea:focus {
   background: #fff;
   border-color: #c8922a;
   box-shadow: 0 0 0 3px rgba(200,146,42,0.1);

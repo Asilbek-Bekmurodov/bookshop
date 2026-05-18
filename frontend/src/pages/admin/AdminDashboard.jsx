@@ -177,6 +177,12 @@ const AdminDashboard = () => {
   const [editingCat, setEditingCat] = useState(null)
   const [catForm, setCatForm] = useState({ name:'', description:'', color:'#2d4a3e', books:0 })
 
+  // Authors state
+  const [authors, setAuthors] = useState([])
+  const [authorModal, setAuthorModal] = useState(null)
+  const [editingAuthor, setEditingAuthor] = useState(null)
+  const [authorForm, setAuthorForm] = useState({ name: '', bio: '', nationality: '', photo: '' })
+
   useEffect(() => {
     const handleClick = (e) => {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
@@ -189,6 +195,10 @@ const AdminDashboard = () => {
 
   useEffect(() => {
     api.get('/users').then(({ data }) => setUsers(data)).catch(() => {})
+  }, [])
+
+  useEffect(() => {
+    api.get('/authors').then(({ data }) => setAuthors(data)).catch(() => {})
   }, [])
 
   /* ── Users CRUD ── */
@@ -224,6 +234,44 @@ const AdminDashboard = () => {
       await api.delete(`/users/${editingUser._id}`)
       setUsers(prev => prev.filter(u => u._id !== editingUser._id))
       setUserModal(null)
+    } catch (e) {
+      alert(e.response?.data?.message || 'Xato yuz berdi')
+    }
+  }
+
+  /* ── Authors CRUD ── */
+  const openAddAuthor = () => {
+    setAuthorForm({ name: '', bio: '', nationality: '', photo: '' })
+    setEditingAuthor(null)
+    setAuthorModal('add')
+  }
+  const openEditAuthor = (a) => {
+    setAuthorForm({ name: a.name, bio: a.bio || '', nationality: a.nationality || '', photo: a.photo || '' })
+    setEditingAuthor(a)
+    setAuthorModal('edit')
+  }
+  const openDelAuthor = (a) => { setEditingAuthor(a); setAuthorModal('delete') }
+
+  const saveAuthor = async () => {
+    try {
+      if (authorModal === 'add') {
+        const { data } = await api.post('/authors', authorForm)
+        setAuthors(prev => [data, ...prev])
+      } else {
+        const { data } = await api.put(`/authors/${editingAuthor._id}`, authorForm)
+        setAuthors(prev => prev.map(a => a._id === editingAuthor._id ? data : a))
+      }
+      setAuthorModal(null)
+    } catch (e) {
+      alert(e.response?.data?.message || 'Xato yuz berdi')
+    }
+  }
+
+  const delAuthor = async () => {
+    try {
+      await api.delete(`/authors/${editingAuthor._id}`)
+      setAuthors(prev => prev.filter(a => a._id !== editingAuthor._id))
+      setAuthorModal(null)
     } catch (e) {
       alert(e.response?.data?.message || 'Xato yuz berdi')
     }
@@ -289,6 +337,7 @@ const AdminDashboard = () => {
     { id: 'users',      label: 'Users',      Icon: UsersIcon },
     { id: 'books',      label: 'Books',      Icon: BookIcon },
     { id: 'categories', label: 'Categories', Icon: TagIcon },
+    { id: 'authors',    label: 'Authors',    Icon: UserSingleIcon },
   ]
 
   const sectionLabel = NAV.find(n => n.id === activeSection)?.label || 'Overview'
@@ -398,6 +447,50 @@ const AdminDashboard = () => {
           {activeSection === 'categories' && (
             <CategoriesSection cats={cats} onAdd={openAddCat} onEdit={openEditCat} onDelete={openDelCat} />
           )}
+          {activeSection === 'authors' && (
+            <div className={styles.section}>
+              <div className={styles.sectionHeader}>
+                <h2 className={styles.sectionTitle}>Authors</h2>
+                <button className={styles.addBtn} onClick={openAddAuthor}>
+                  <PlusIcon /> Add Author
+                </button>
+              </div>
+              <div className={styles.tableWrap}>
+                <table className={styles.table}>
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Nationality</th>
+                      <th>Bio</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {authors.map(a => (
+                      <tr key={a._id}>
+                        <td><strong>{a.name}</strong></td>
+                        <td>{a.nationality || '—'}</td>
+                        <td style={{ maxWidth: 300, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                          {a.bio || '—'}
+                        </td>
+                        <td>
+                          <div className={styles.actions}>
+                            <button className={styles.editBtn} onClick={() => openEditAuthor(a)}><EditIcon /></button>
+                            <button className={styles.delBtn} onClick={() => openDelAuthor(a)}><TrashIcon /></button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                    {authors.length === 0 && (
+                      <tr><td colSpan={4} style={{ textAlign: 'center', padding: '2rem', color: '#a09070' }}>
+                        Hali author yo'q
+                      </td></tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
         </main>
       </div>
 
@@ -506,6 +599,49 @@ const AdminDashboard = () => {
             <div className={styles.modalActions}>
               <button className={styles.cancelBtn} onClick={() => setBookModal(null)}>Cancel</button>
               <button className={styles.deleteBtn} onClick={delBook}>Delete Book</button>
+            </div>
+          </div>
+        </Modal>
+      )}
+
+      {/* ══ Authors Modals ══ */}
+      {(authorModal === 'add' || authorModal === 'edit') && (
+        <Modal title={authorModal === 'add' ? 'Add Author' : 'Edit Author'} onClose={() => setAuthorModal(null)}>
+          <div className={styles.modalBody}>
+            <div className={styles.formField}>
+              <label>Full Name *</label>
+              <input value={authorForm.name} onChange={e => setAuthorForm(f => ({ ...f, name: e.target.value }))} placeholder="Dostoevsky" />
+            </div>
+            <div className={styles.formField}>
+              <label>Nationality</label>
+              <input value={authorForm.nationality} onChange={e => setAuthorForm(f => ({ ...f, nationality: e.target.value }))} placeholder="Russian" />
+            </div>
+            <div className={styles.formField}>
+              <label>Bio</label>
+              <textarea value={authorForm.bio} onChange={e => setAuthorForm(f => ({ ...f, bio: e.target.value }))} placeholder="Short bio..." rows={3} style={{ width: '100%', resize: 'vertical' }} />
+            </div>
+            <div className={styles.formField}>
+              <label>Photo URL</label>
+              <input value={authorForm.photo} onChange={e => setAuthorForm(f => ({ ...f, photo: e.target.value }))} placeholder="https://..." />
+            </div>
+            <div className={styles.modalActions}>
+              <button className={styles.cancelBtn} onClick={() => setAuthorModal(null)}>Cancel</button>
+              <button className={styles.submitBtn} onClick={saveAuthor}>
+                {authorModal === 'add' ? 'Add Author' : 'Save Changes'}
+              </button>
+            </div>
+          </div>
+        </Modal>
+      )}
+      {authorModal === 'delete' && editingAuthor && (
+        <Modal title="Delete Author" onClose={() => setAuthorModal(null)}>
+          <div className={styles.modalBody}>
+            <p className={styles.deleteMsg}>
+              <strong>{editingAuthor.name}</strong> nomli autherni o'chirmoqchimisiz?
+            </p>
+            <div className={styles.modalActions}>
+              <button className={styles.cancelBtn} onClick={() => setAuthorModal(null)}>Cancel</button>
+              <button className={styles.deleteBtn} onClick={delAuthor}>Delete</button>
             </div>
           </div>
         </Modal>

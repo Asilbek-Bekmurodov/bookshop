@@ -144,7 +144,7 @@ const BookDetailPage = () => {
             <StarRating rating={book.rating} />
             <span className={styles.ratingScore}>{book.rating}</span>
             <span className={styles.ratingCount}>
-              ({book.reviews.toLocaleString()} reviews)
+              ({(book.reviews ?? 0).toLocaleString()} reviews)
             </span>
           </div>
 
@@ -226,7 +226,7 @@ const BookDetailPage = () => {
               <div>
                 <StarRating rating={book.rating} />
                 <p className={styles.totalReviews}>
-                  {book.reviews.toLocaleString()} reviews
+                  {(book.reviews ?? 0).toLocaleString()} reviews
                 </p>
               </div>
             </div>

@@ -725,7 +725,15 @@ const AdminDashboard = () => {
               <input
                 type="file"
                 accept=".pdf"
-                onChange={e => setPdfFile(e.target.files?.[0] || null)}
+                onChange={e => {
+                  const file = e.target.files?.[0] || null;
+                  if (file && file.size > 50 * 1024 * 1024) {
+                    alert('PDF fayl 50MB dan kichik bo\'lishi kerak');
+                    e.target.value = '';
+                    return;
+                  }
+                  setPdfFile(file);
+                }}
                 style={{ color: '#c8b89a' }}
               />
               {editingBook?.pdfUrl && !pdfFile && (

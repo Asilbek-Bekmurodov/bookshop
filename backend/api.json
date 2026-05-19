@@ -1,0 +1,1302 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Bookshop API",
+    "version": "1.0.0",
+    "description": "Bookshop loyihasi uchun REST API dokumentatsiyasi"
+  },
+  "servers": [
+    {
+      "url": "https://bookshop-u08d.onrender.com",
+      "description": "Production server"
+    },
+    {
+      "url": "http://localhost:5001",
+      "description": "Local server"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    },
+    "schemas": {
+      "User": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "664f1a2b3c4d5e6f7a8b9c0d"
+          },
+          "name": {
+            "type": "string",
+            "example": "Ali Karimov"
+          },
+          "email": {
+            "type": "string",
+            "example": "ali@example.com"
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "user",
+              "admin"
+            ],
+            "example": "user"
+          }
+        }
+      },
+      "AuthResponse": {
+        "type": "object",
+        "properties": {
+          "accessToken": {
+            "type": "string",
+            "example": "eyJhbGci..."
+          },
+          "user": {
+            "$ref": "#/components/schemas/User"
+          }
+        }
+      },
+      "Error": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "example": "Xato xabari"
+          }
+        }
+      },
+      "Author": {
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "string",
+            "example": "664f1a2b3c4d5e6f7a8b9c0d"
+          },
+          "name": {
+            "type": "string",
+            "example": "Fyodor Dostoevsky"
+          },
+          "nationality": {
+            "type": "string",
+            "example": "Russian"
+          },
+          "bio": {
+            "type": "string",
+            "example": "Russian novelist..."
+          },
+          "photo": {
+            "type": "string",
+            "example": "https://..."
+          }
+        }
+      },
+      "Book": {
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "string",
+            "example": "664f1a2b3c4d5e6f7a8b9c0d"
+          },
+          "title": {
+            "type": "string",
+            "example": "Crime and Punishment"
+          },
+          "author": {
+            "$ref": "#/components/schemas/Author"
+          },
+          "category": {
+            "type": "string",
+            "example": "Fiction"
+          },
+          "rating": {
+            "type": "number",
+            "example": 4.8
+          },
+          "description": {
+            "type": "string",
+            "example": "A psychological novel..."
+          },
+          "coverColor": {
+            "type": "string",
+            "example": "purple"
+          },
+          "badge": {
+            "type": "string",
+            "enum": [
+              "Bestseller",
+              "New",
+              "Hot",
+              ""
+            ],
+            "example": "Bestseller"
+          },
+          "genre": {
+            "type": "string",
+            "example": "Drama"
+          },
+          "pageCount": {
+            "type": "integer",
+            "example": 551
+          },
+          "publishedYear": {
+            "type": "integer",
+            "example": 1866
+          },
+          "pdfUrl": {
+            "type": "string",
+            "example": "https://supabase.co/storage/..."
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "BookInput": {
+        "type": "object",
+        "required": [
+          "title",
+          "authorId"
+        ],
+        "properties": {
+          "title": {
+            "type": "string",
+            "example": "Crime and Punishment"
+          },
+          "authorId": {
+            "type": "string",
+            "example": "664f1a2b3c4d5e6f7a8b9c0d"
+          },
+          "authorName": {
+            "type": "string",
+            "example": "Fyodor Dostoevsky",
+            "description": "authorId yo'q bo'lsa ishlatiladi"
+          },
+          "category": {
+            "type": "string",
+            "example": "Fiction"
+          },
+          "rating": {
+            "type": "number",
+            "example": 4.8
+          },
+          "description": {
+            "type": "string",
+            "example": "A psychological novel..."
+          },
+          "coverColor": {
+            "type": "string",
+            "example": "purple"
+          },
+          "badge": {
+            "type": "string",
+            "enum": [
+              "Bestseller",
+              "New",
+              "Hot",
+              ""
+            ]
+          },
+          "genre": {
+            "type": "string",
+            "example": "Drama"
+          },
+          "pageCount": {
+            "type": "integer",
+            "example": 551
+          },
+          "publishedYear": {
+            "type": "integer",
+            "example": 1866
+          }
+        }
+      }
+    }
+  },
+  "paths": {
+    "/api/auth/register": {
+      "post": {
+        "summary": "Ro'yxatdan o'tish (faqat user role)",
+        "tags": [
+          "Auth"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "name",
+                  "email",
+                  "password"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "example": "Ali Karimov"
+                  },
+                  "email": {
+                    "type": "string",
+                    "example": "ali@example.com"
+                  },
+                  "password": {
+                    "type": "string",
+                    "minLength": 8,
+                    "example": "parol123"
+                  },
+                  "age": {
+                    "type": "integer",
+                    "minimum": 5,
+                    "maximum": 120,
+                    "example": 25
+                  },
+                  "favAuthors": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "example": [
+                      "Fyodor Dostoevsky",
+                      "Leo Tolstoy"
+                    ]
+                  },
+                  "favGenres": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "enum": [
+                        "Fiction",
+                        "Non-fiction",
+                        "Mystery",
+                        "Science Fiction",
+                        "Fantasy",
+                        "Romance",
+                        "History",
+                        "Self-help",
+                        "Thriller",
+                        "Biography"
+                      ]
+                    },
+                    "example": [
+                      "Fiction",
+                      "Thriller"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Muvaffaqiyatli ro'yxatdan o'tish",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Noto'g'ri ma'lumot",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Email allaqachon mavjud",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/login": {
+      "post": {
+        "summary": "Tizimga kirish",
+        "tags": [
+          "Auth"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "email",
+                  "password"
+                ],
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "example": "ali@example.com"
+                  },
+                  "password": {
+                    "type": "string",
+                    "example": "parol123"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Muvaffaqiyatli kirish. refreshToken httpOnly cookie da qaytadi.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Email yoki parol noto'g'ri",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/refresh": {
+      "post": {
+        "summary": "Yangi access token olish",
+        "tags": [
+          "Auth"
+        ],
+        "description": "refreshToken httpOnly cookie orqali yuboriladi. Yangi access token + rotated refresh token qaytaradi.",
+        "responses": {
+          "200": {
+            "description": "Yangi tokenlar",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Refresh token yo'q yoki yaroqsiz",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/logout": {
+      "post": {
+        "summary": "Tizimdan chiqish",
+        "tags": [
+          "Auth"
+        ],
+        "description": "refreshToken cookie ni o'chiradi va DB dan tokenni o'chiradi.",
+        "responses": {
+          "200": {
+            "description": "Muvaffaqiyatli chiqish",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Chiqildi"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/me": {
+      "get": {
+        "summary": "Joriy foydalanuvchi ma'lumoti",
+        "tags": [
+          "Auth"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Foydalanuvchi ma'lumoti",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "user": {
+                      "$ref": "#/components/schemas/User"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Token yo'q yoki yaroqsiz",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/authors": {
+      "get": {
+        "summary": "Barcha mualliflar ro'yxati",
+        "tags": [
+          "Authors"
+        ],
+        "responses": {
+          "200": {
+            "description": "Mualliflar massivi",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Author"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Yangi muallif yaratish (admin)",
+        "tags": [
+          "Authors"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "name"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "example": "Fyodor Dostoevsky"
+                  },
+                  "bio": {
+                    "type": "string",
+                    "example": "Rus yozuvchisi"
+                  },
+                  "nationality": {
+                    "type": "string",
+                    "example": "Russian"
+                  },
+                  "photo": {
+                    "type": "string",
+                    "example": "https://example.com/photo.jpg"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Yaratilgan muallif",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Author"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "name majburiy yoki bu nom bilan muallif mavjud"
+          },
+          "401": {
+            "description": "Avtorizatsiya talab qilinadi"
+          }
+        }
+      }
+    },
+    "/api/authors/search": {
+      "get": {
+        "summary": "Muallif nomi bo'yicha qidirish (autocomplete)",
+        "tags": [
+          "Authors"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "q",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Qidiruv so'zi (kamida 1 harf)",
+            "example": "Dost"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Mos kelgan mualliflar (max 10)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "_id": {
+                        "type": "string"
+                      },
+                      "name": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/authors/{id}": {
+      "get": {
+        "summary": "Bitta muallif ma'lumotlari",
+        "tags": [
+          "Authors"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Muallif ma'lumoti",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Author"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Muallif topilmadi"
+          }
+        }
+      },
+      "put": {
+        "summary": "Muallifni tahrirlash (admin)",
+        "tags": [
+          "Authors"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "bio": {
+                    "type": "string"
+                  },
+                  "nationality": {
+                    "type": "string"
+                  },
+                  "photo": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Yangilangan muallif",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Author"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Muallif topilmadi"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Muallifni o'chirish (admin)",
+        "tags": [
+          "Authors"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "O'chirildi"
+          },
+          "404": {
+            "description": "Muallif topilmadi"
+          }
+        }
+      }
+    },
+    "/api/books": {
+      "get": {
+        "summary": "Barcha kitoblar ro'yxati",
+        "tags": [
+          "Books"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Nechta kitob qaytarilsin (0 = hammasi)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Kitoblar massivi",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Book"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Yangi kitob yaratish (admin)",
+        "tags": [
+          "Books"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BookInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Yaratilgan kitob",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Book"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Majburiy maydon yo'q"
+          },
+          "401": {
+            "description": "Avtorizatsiya talab qilinadi"
+          }
+        }
+      }
+    },
+    "/api/books/{id}": {
+      "get": {
+        "summary": "Bitta kitob",
+        "tags": [
+          "Books"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Kitob ma'lumotlari",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Book"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Kitob topilmadi"
+          }
+        }
+      },
+      "put": {
+        "summary": "Kitobni tahrirlash (admin)",
+        "tags": [
+          "Books"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BookInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Yangilangan kitob",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Book"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Kitob topilmadi"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Kitobni o'chirish (admin)",
+        "tags": [
+          "Books"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "O'chirildi"
+          },
+          "404": {
+            "description": "Kitob topilmadi"
+          }
+        }
+      }
+    },
+    "/api/books/{id}/upload-pdf": {
+      "post": {
+        "summary": "Kitobga PDF yuklash (admin)",
+        "tags": [
+          "Books"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "pdf": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "PDF fayl (max 50MB)"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "PDF yuklandi, kitob yangilandi",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Book"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "PDF fayl yuborilmadi"
+          },
+          "404": {
+            "description": "Kitob topilmadi"
+          }
+        }
+      }
+    },
+    "/api/users": {
+      "get": {
+        "summary": "Barcha foydalanuvchilar ro'yxati",
+        "tags": [
+          "Users"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Foydalanuvchilar ro'yxati",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/User"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Token yo'q"
+          },
+          "403": {
+            "description": "Admin emas"
+          }
+        }
+      },
+      "post": {
+        "summary": "Yangi foydalanuvchi yaratish",
+        "tags": [
+          "Users"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "name",
+                  "email",
+                  "password"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "example": "Ali Karimov"
+                  },
+                  "email": {
+                    "type": "string",
+                    "example": "ali@example.com"
+                  },
+                  "password": {
+                    "type": "string",
+                    "example": "parol123"
+                  },
+                  "role": {
+                    "type": "string",
+                    "enum": [
+                      "user",
+                      "admin"
+                    ],
+                    "example": "user"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Yaratildi",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Noto'g'ri ma'lumot yoki email band"
+          }
+        }
+      }
+    },
+    "/api/users/{id}": {
+      "get": {
+        "summary": "Bitta foydalanuvchi",
+        "tags": [
+          "Users"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Foydalanuvchi ma'lumoti",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Topilmadi"
+          }
+        }
+      },
+      "patch": {
+        "summary": "Foydalanuvchini tahrirlash",
+        "tags": [
+          "Users"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "email": {
+                    "type": "string"
+                  },
+                  "role": {
+                    "type": "string",
+                    "enum": [
+                      "user",
+                      "admin"
+                    ]
+                  },
+                  "password": {
+                    "type": "string",
+                    "description": "Bo'sh qoldirilsa o'zgarmaydi"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Yangilandi",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Topilmadi"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Foydalanuvchini o'chirish",
+        "tags": [
+          "Users"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "O'chirildi"
+          },
+          "404": {
+            "description": "Topilmadi"
+          }
+        }
+      }
+    },
+    "/api/users/me": {
+      "get": {
+        "summary": "Joriy foydalanuvchi profili",
+        "tags": [
+          "Users"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Foydalanuvchi profili",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Token yo'q yoki yaroqsiz"
+          }
+        }
+      },
+      "patch": {
+        "summary": "Joriy foydalanuvchi profilini yangilash",
+        "tags": [
+          "Users"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "example": "Ali Karimov"
+                  },
+                  "age": {
+                    "type": "integer",
+                    "example": 25
+                  },
+                  "favAuthors": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "example": [
+                      "Dostoevsky",
+                      "Tolstoy"
+                    ]
+                  },
+                  "favGenres": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "example": [
+                      "Fiction",
+                      "Philosophy"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Yangilangan profil",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Token yo'q yoki yaroqsiz"
+          }
+        }
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "Authors",
+      "description": "Mualliflar CRUD"
+    },
+    {
+      "name": "Books",
+      "description": "Kitoblar CRUD va PDF yuklash"
+    },
+    {
+      "name": "Users",
+      "description": "Foydalanuvchilarni boshqarish (faqat admin)"
+    }
+  ]
+}

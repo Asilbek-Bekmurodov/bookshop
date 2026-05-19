@@ -155,6 +155,61 @@ import { protect, requireAdmin } from '../middleware/auth.js';
  *         description: Topilmadi
  */
 
+/**
+ * @swagger
+ * /api/users/me:
+ *   get:
+ *     summary: Joriy foydalanuvchi profili
+ *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Foydalanuvchi profili
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/User'
+ *       401:
+ *         description: Token yo'q yoki yaroqsiz
+ *   patch:
+ *     summary: Joriy foydalanuvchi profilini yangilash
+ *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 example: Ali Karimov
+ *               age:
+ *                 type: integer
+ *                 example: 25
+ *               favAuthors:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                 example: ["Dostoevsky", "Tolstoy"]
+ *               favGenres:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                 example: ["Fiction", "Philosophy"]
+ *     responses:
+ *       200:
+ *         description: Yangilangan profil
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/User'
+ *       401:
+ *         description: Token yo'q yoki yaroqsiz
+ */
+
 const router = Router();
 
 // GET /api/users/me - joriy foydalanuvchi profili

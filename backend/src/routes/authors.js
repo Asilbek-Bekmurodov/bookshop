@@ -2,6 +2,169 @@ import { Router } from 'express';
 import Author from '../models/Author.js';
 import { protect, requireAdmin } from '../middleware/auth.js';
 
+/**
+ * @swagger
+ * tags:
+ *   name: Authors
+ *   description: Mualliflar CRUD
+ */
+
+/**
+ * @swagger
+ * /api/authors:
+ *   get:
+ *     summary: Barcha mualliflar ro'yxati
+ *     tags: [Authors]
+ *     responses:
+ *       200:
+ *         description: Mualliflar massivi
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Author'
+ *   post:
+ *     summary: Yangi muallif yaratish (admin)
+ *     tags: [Authors]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [name]
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 example: Fyodor Dostoevsky
+ *               bio:
+ *                 type: string
+ *                 example: Rus yozuvchisi
+ *               nationality:
+ *                 type: string
+ *                 example: Russian
+ *               photo:
+ *                 type: string
+ *                 example: https://example.com/photo.jpg
+ *     responses:
+ *       201:
+ *         description: Yaratilgan muallif
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Author'
+ *       400:
+ *         description: name majburiy yoki bu nom bilan muallif mavjud
+ *       401:
+ *         description: Avtorizatsiya talab qilinadi
+ */
+
+/**
+ * @swagger
+ * /api/authors/search:
+ *   get:
+ *     summary: Muallif nomi bo'yicha qidirish (autocomplete)
+ *     tags: [Authors]
+ *     parameters:
+ *       - in: query
+ *         name: q
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Qidiruv so'zi (kamida 1 harf)
+ *         example: Dost
+ *     responses:
+ *       200:
+ *         description: Mos kelgan mualliflar (max 10)
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   _id:
+ *                     type: string
+ *                   name:
+ *                     type: string
+ */
+
+/**
+ * @swagger
+ * /api/authors/{id}:
+ *   get:
+ *     summary: Bitta muallif ma'lumotlari
+ *     tags: [Authors]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Muallif ma'lumoti
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Author'
+ *       404:
+ *         description: Muallif topilmadi
+ *   put:
+ *     summary: Muallifni tahrirlash (admin)
+ *     tags: [Authors]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *               bio:
+ *                 type: string
+ *               nationality:
+ *                 type: string
+ *               photo:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Yangilangan muallif
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Author'
+ *       404:
+ *         description: Muallif topilmadi
+ *   delete:
+ *     summary: Muallifni o'chirish (admin)
+ *     tags: [Authors]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: O'chirildi
+ *       404:
+ *         description: Muallif topilmadi
+ */
+
 const router = Router();
 
 // GET /api/authors - barcha authorlar (public)

@@ -1,9 +1,10 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import styles from './DashboardPage.module.css'
 import AudioSection from '../components/AudioSection/AudioSection'
 import AudioPlayer from '../components/AudioPlayer/AudioPlayer'
 import StreakBadge from '../components/StreakBadge/StreakBadge'
+import api from '../api/axios'
 
 /* ── Icons ─────────────────────────────────────────────────── */
 const SearchIcon = () => (
@@ -71,22 +72,17 @@ const TrophyIcon = () => (
 )
 
 /* ── Data ───────────────────────────────────────────────────── */
-const BOOKS = [
-  { id: 1,  title: "The Great Gatsby",          author: "F. Scott Fitzgerald", category: "Fiction",    rating: 4.8, price: "$12.99", pages: 180,  color: "#2d4a3e", spine: "#1a3028" },
-  { id: 2,  title: "Sapiens",                   author: "Yuval Noah Harari",   category: "History",    rating: 4.9, price: "$15.99", pages: 443,  color: "#4a2d2d", spine: "#3a1a1a" },
-  { id: 3,  title: "Atomic Habits",             author: "James Clear",          category: "Self-Help",  rating: 4.9, price: "$14.99", pages: 320,  color: "#2a3a4a", spine: "#1a2a38" },
-  { id: 4,  title: "1984",                      author: "George Orwell",        category: "Fiction",    rating: 4.7, price: "$10.99", pages: 328,  color: "#3a3028", spine: "#2a2018" },
-  { id: 5,  title: "Thinking, Fast and Slow",   author: "Daniel Kahneman",     category: "Psychology", rating: 4.6, price: "$16.99", pages: 499,  color: "#2a4a3a", spine: "#1a3828" },
-  { id: 6,  title: "The Alchemist",             author: "Paulo Coelho",         category: "Fiction",    rating: 4.8, price: "$11.99", pages: 208,  color: "#4a3a20", spine: "#382c14" },
-  { id: 7,  title: "Educated",                  author: "Tara Westover",        category: "Biography",  rating: 4.7, price: "$13.99", pages: 352,  color: "#3a2a4a", spine: "#2a1a38" },
-  { id: 8,  title: "The Power of Now",          author: "Eckhart Tolle",       category: "Philosophy", rating: 4.5, price: "$12.49", pages: 229,  color: "#284a40", spine: "#1a3830" },
-  { id: 9,  title: "Dune",                      author: "Frank Herbert",        category: "Sci-Fi",     rating: 4.9, price: "$17.99", pages: 688,  color: "#3a4020", spine: "#2a3010" },
-  { id: 10, title: "To Kill a Mockingbird",     author: "Harper Lee",           category: "Fiction",    rating: 4.8, price: "$11.49", pages: 281,  color: "#4a2838", spine: "#381820" },
-  { id: 11, title: "Man's Search for Meaning",  author: "Viktor E. Frankl",    category: "Philosophy", rating: 4.9, price: "$10.49", pages: 200,  color: "#303842", spine: "#202830" },
-  { id: 12, title: "The Midnight Library",      author: "Matt Haig",            category: "Fiction",    rating: 4.6, price: "$13.49", pages: 304,  color: "#283040", spine: "#182030" },
-]
+const COLOR_MAP = {
+  green:  { color: '#2d4a3e', spine: '#1a3028' },
+  blue:   { color: '#2a3a4a', spine: '#1a2a38' },
+  purple: { color: '#3a2a4a', spine: '#2a1a38' },
+  red:    { color: '#4a2d2d', spine: '#3a1a1a' },
+  dark:   { color: '#303842', spine: '#202830' },
+  orange: { color: '#4a3a20', spine: '#382c14' },
+  teal:   { color: '#284a40', spine: '#1a3830' },
+}
 
-const CATEGORIES = ["All", "Fiction", "History", "Psychology", "Philosophy", "Biography", "Self-Help", "Sci-Fi"]
+const CATEGORIES = ["All", "Fiction", "Non-fiction", "Mystery", "Science Fiction", "Fantasy", "Romance", "History", "Self-help", "Thriller", "Biography", "Philosophy", "Psychology", "Sci-Fi"]
 
 const FEATURED = [
   { title: "New Arrivals This Week",  sub: "20 fresh titles just added", bg: "linear-gradient(135deg, #1c2d20 0%, #2d4a3e 100%)" },
@@ -107,10 +103,16 @@ const SIDEBAR_NAV = [
 const DashboardPage = () => {
   const navigate = useNavigate()
   const [activeCategory, setActiveCategory] = useState("All")
-  const [favorites, setFavorites] = useState(new Set([1, 6]))
+  const [favorites, setFavorites] = useState(new Set())
   const [searchQuery, setSearchQuery] = useState('')
   const [currentAudio, setCurrentAudio] = useState(null)
   const [audioPlaylist, setAudioPlaylist] = useState([])
+  const [books, setBooks] = useState([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    api.get('/books').then(({ data }) => setBooks(data)).catch(() => {}).finally(() => setLoading(false))
+  }, [])
 
   const handleAudioPlay = (item, playlist) => {
     setCurrentAudio(item)
@@ -126,11 +128,12 @@ const DashboardPage = () => {
     setCurrentAudio(item)
   }
 
-  const filteredBooks = BOOKS.filter(b => {
+  const filteredBooks = books.filter(b => {
     const matchesCategory = activeCategory === "All" || b.category === activeCategory
+    const authorName = b.author?.name || b.author || ''
     const matchesSearch = !searchQuery ||
       b.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      b.author.toLowerCase().includes(searchQuery.toLowerCase())
+      authorName.toLowerCase().includes(searchQuery.toLowerCase())
     return matchesCategory && matchesSearch
   })
 
@@ -142,6 +145,9 @@ const DashboardPage = () => {
       return next
     })
   }
+
+  const getCategoryCount = (cat) =>
+    cat === "All" ? books.length : books.filter(b => b.category === cat).length
 
   const handleLogout = () => navigate('/login')
 
@@ -211,9 +217,7 @@ const DashboardPage = () => {
                 onClick={() => setActiveCategory(cat)}
               >
                 <span>{cat}</span>
-                <span className={styles.categoryCount}>
-                  {cat === "All" ? BOOKS.length : BOOKS.filter(b => b.category === cat).length}
-                </span>
+                <span className={styles.categoryCount}>{getCategoryCount(cat)}</span>
               </div>
             ))}
           </div>
@@ -253,7 +257,7 @@ const DashboardPage = () => {
                 What will you <em>read</em> today?
               </h1>
               <p className={styles.bannerSub}>
-                12,000+ books across every genre, curated just for you.
+                {books.length > 0 ? `${books.length} kitob` : 'Kitoblar'} — har xil janrda, siz uchun tanlangan.
               </p>
             </div>
             <div className={styles.bannerActions}>
@@ -305,37 +309,49 @@ const DashboardPage = () => {
           </div>
 
           {/* Grid */}
-          <div className={styles.bookGrid}>
-            {filteredBooks.map(book => (
-              <div key={book.id} className={styles.bookCard}>
-                <div className={styles.bookCover} style={{ background: `linear-gradient(160deg, ${book.color}, ${book.spine})` }}>
-                  <div className={styles.bookSpineAccent} style={{ background: `linear-gradient(180deg, rgba(255,255,255,0.15), transparent)` }} />
-                  <div className={styles.bookCoverPattern} />
-                  <button
-                    className={`${styles.bookFavBtn} ${favorites.has(book.id) ? styles.favorited : ''}`}
-                    onClick={e => toggleFav(book.id, e)}
-                    title="Add to favourites"
-                  >
-                    <HeartIcon filled={favorites.has(book.id)} />
-                  </button>
-                  <span className={styles.bookCoverTitle}>{book.title}</span>
-                </div>
-                <div className={styles.bookInfo}>
-                  <div className={styles.bookCategory}>{book.category}</div>
-                  <div className={styles.bookTitle}>{book.title}</div>
-                  <div className={styles.bookAuthor}>{book.author}</div>
-                  <div className={styles.bookMeta}>
-                    <span className={styles.bookRating}>
-                      <StarIcon /> {book.rating}
-                    </span>
-                    <span className={styles.bookPrice}>{book.price}</span>
+          {loading ? (
+            <div style={{ textAlign: 'center', padding: '60px 0', color: '#b0a070', fontFamily: "'Playfair Display', serif", fontSize: 18 }}>
+              Loading…
+            </div>
+          ) : (
+            <div className={styles.bookGrid}>
+              {filteredBooks.map(book => {
+                const palette = COLOR_MAP[book.coverColor] || COLOR_MAP.green
+                const authorName = book.author?.name || book.author || ''
+                return (
+                  <div key={book._id} className={styles.bookCard} onClick={() => navigate(`/books/${book._id}`)} style={{ cursor: 'pointer' }}>
+                    <div className={styles.bookCover} style={{ background: `linear-gradient(160deg, ${palette.color}, ${palette.spine})` }}>
+                      <div className={styles.bookSpineAccent} style={{ background: `linear-gradient(180deg, rgba(255,255,255,0.15), transparent)` }} />
+                      <div className={styles.bookCoverPattern} />
+                      <button
+                        className={`${styles.bookFavBtn} ${favorites.has(book._id) ? styles.favorited : ''}`}
+                        onClick={e => toggleFav(book._id, e)}
+                        title="Add to favourites"
+                      >
+                        <HeartIcon filled={favorites.has(book._id)} />
+                      </button>
+                      <span className={styles.bookCoverTitle}>{book.title}</span>
+                    </div>
+                    <div className={styles.bookInfo}>
+                      <div className={styles.bookCategory}>{book.category}</div>
+                      <div className={styles.bookTitle}>{book.title}</div>
+                      <div className={styles.bookAuthor}>{authorName}</div>
+                      <div className={styles.bookMeta}>
+                        <span className={styles.bookRating}>
+                          <StarIcon /> {book.rating ?? 0}
+                        </span>
+                        <span className={styles.bookPrice}>
+                          {book.pdfUrl ? "O'qish mumkin" : "Tez kunda"}
+                        </span>
+                      </div>
+                    </div>
                   </div>
-                </div>
-              </div>
-            ))}
-          </div>
+                )
+              })}
+            </div>
+          )}
 
-          {filteredBooks.length === 0 && (
+          {!loading && filteredBooks.length === 0 && (
             <div style={{ textAlign: 'center', padding: '60px 0', color: '#b0a070', fontFamily: "'Playfair Display', serif", fontSize: 18 }}>
               No books found.
             </div>
